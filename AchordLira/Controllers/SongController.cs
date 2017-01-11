@@ -6,10 +6,11 @@ using System.Web.Mvc;
 
 namespace AchordLira.Controllers
 {
-    public class HomeController : Controller
+    public class SongController : Controller
     {
-        public ActionResult Index()
+        public ActionResult Index(string name,string artist)
         {
+            ViewBag.songName = name + artist;
             return View();
         }
     }
