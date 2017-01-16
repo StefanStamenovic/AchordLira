@@ -7,18 +7,53 @@
 <div class="row">
     <div class="col-md-3">
         <div class="panel">
-            <h1>List</h1>
-        </div>
-    </div>
-    <div class="col-md-9">
-        <div class="jumbotron">
-            <div class="panel-heading">Song</div>
-            <div class="panel-body">
-                Content
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">@Model.artist</h3>
+                </div>
+            </div>
+            <div class="list-group">
+                @foreach (var song in Model.songs)
+                {
+                    <a href="#" class="list-group-item">@song.name</a>
+                }
             </div>
         </div>
-        <div class="jumbotron">
-            <div class="panel-heading">Messages</div>
+    </div>
+    <div class="col-md-8">
+        <div class="well" style="padding-left: 40px;">
+            <h3 style="margin-bottom: 0px;">@Model.artist</h3>
+            <h1 class="text-muted" style="margin-top: 0px; margin-bottom: 40px;">@Model.song.name</h1>
+            <h4 style="font-family: monospace; white-space: pre;">@Model.song.content</h4>
+        </div>
+        <div class="col-md-8">
+            <form class="form-horizontal well" style="padding-top: 0px; padding-bottom: 0px;">
+                <div class="form-group" style="margin-top: 15px;">
+                  <div class="col-lg-10">
+                    <input type="text" class="form-control" id="inputEmail" placeholder="Author">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-lg-10">
+                    <textarea class="form-control" rows="3" id="textArea" placeholder="Comment text"></textarea>
+                  </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-10">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </form>
+            <hr />
+            <h4>Comments</h4>
+            @foreach (var message in Model.messages)
+            {
+                <hr />
+                <blockquote>
+                    <p>@message.content</p>
+                    <small>author <cite title="Source Title">@message.creator</cite></small>
+                </blockquote>
+            }
         </div>
     </div>
 </div>

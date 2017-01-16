@@ -25,12 +25,6 @@ namespace AchordLira
                 defaults: new { controller = "Song", action = "Index", artist = "", name = ""}
             );
 
-            /*routes.MapRoute(
-                name: "User",
-                url: "User/{action}",
-                defaults: new { controller = "User", action ="Index"}
-                );*/
-
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",

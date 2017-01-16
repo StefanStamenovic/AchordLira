@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AchordLira.Models.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,7 +12,17 @@ namespace AchordLira.Controllers
         // GET: User
         public ActionResult Index()
         {
-            return View();
+            //TODO: Conect data base and get data
+            UserPageViewModel pageModel = new UserPageViewModel();
+            pageModel.user = new ViewUser
+            {
+                name = "Stefan",
+                email = "stefan.stamenovic@gmail.com",
+                link = "/User/Stefan",
+                admin = true
+            };
+            var model = pageModel;
+            return View(model);
         }
 
         // GET: User/Login
