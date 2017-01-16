@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using AchordLira.Models.ViewModels;
+using AchordLira.Models.Neo4J;
+using AchordLira.Models.Neo4J.Models;
 
 namespace AchordLira.Controllers
 {
@@ -11,7 +13,17 @@ namespace AchordLira.Controllers
     {
         public ActionResult Index()
         {
-            //TODO: Conect data base and get data
+            Neo4jDataProvider data = new Neo4jDataProvider();
+            User user = new User
+            {
+                id="",
+                name="Stefan",
+                email="stefan.stamenovic@gmail.com",
+                link="/User/" + "Stefan",
+                admin=false
+            };
+            data.UserDelete("Stefan");
+   
             HomePageViewModel pageModel = new HomePageViewModel();
             pageModel.user = new ViewUser
             {
