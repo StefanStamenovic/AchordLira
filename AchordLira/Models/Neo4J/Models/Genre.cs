@@ -7,5 +7,6 @@ namespace AchordLira.Models.Neo4J.Models
 {
     public class Genre
     {
+        public string name { get; set; }
     }
 }

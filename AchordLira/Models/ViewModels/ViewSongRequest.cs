@@ -5,7 +5,7 @@ using System.Web;
 
 namespace AchordLira.Models.ViewModels
 {
-    public class ViewMessageRequest
+    public class ViewSongRequest
     {
         public String author { get; set; }
         public String artist { get; set; }

@@ -33,6 +33,7 @@ namespace AchordLira.Models.Neo4J
 
         public void UserCreate(User user)
         {
+            //TODO: Proveri da li postiji user
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             dictionary.Add("name", user.name);
             dictionary.Add("email", user.email);
@@ -69,14 +70,27 @@ namespace AchordLira.Models.Neo4J
 
         #region Gener
 
-        public void GenreCreate()
+        public void GenreCreate(Genre genre)
         {
+            //TODO: Proveri da li postiji zanar
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("name", genre.name);
 
+            CypherQuery query = new CypherQuery("CREATE (genre:Genre { name: {name}})",
+                       dictionary, CypherResultMode.Set);
+
+            ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
-        public void GenreDelete()
+        public void GenreDelete(String name)
         {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("name", name);
 
+            CypherQuery query = new CypherQuery("MATCH (genre:Genre) WHERE genre.name = {name} DELETE genre",
+                       dictionary, CypherResultMode.Set);
+
+            ((IRawGraphClient)client).ExecuteCypher(query);
         }
         
         public void GenreUpdate()
@@ -93,14 +107,38 @@ namespace AchordLira.Models.Neo4J
 
         #region Artist
 
-        public void ArtistCreate()
+        public void ArtistCreate(Artist artist, List<Genre> genres)
         {
+            //TODO: Proveri da li postoji izvodjaci i zanar
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("name", artist.name);
+            dictionary.Add("link", artist.link);
+            dictionary.Add("biography", artist.biography);
+            dictionary.Add("website", artist.website);
 
+            CypherQuery query = new CypherQuery("CREATE (artist:Artist { name: {name}, link: {link}, biography: {biography}, website: {website}})",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
+
+            foreach(Genre genre in genres)
+            {
+                dictionary = new Dictionary<string, object>();
+                dictionary.Add("artist_name", artist.name);
+                dictionary.Add("genre_name", genre.name);
+                query = new CypherQuery("MATCH (artist:Artist{name: {artist_name}}),(genre:Genre{name: {genre_name}}) CREATE (artist)-[relation:BELONG]->(genre)",
+                           dictionary, CypherResultMode.Set);
+                ((IRawGraphClient)client).ExecuteCypher(query);
+            }
         }
 
-        public void ArtistrDelete()
+        public void ArtistrDelete(String name)
         {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("name", name);
 
+            CypherQuery query = new CypherQuery("MATCH (artist:Artist) WHERE artist.name = {name} DETACH DELETE artist",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
         public void ArtistUpdate()
@@ -117,9 +155,9 @@ namespace AchordLira.Models.Neo4J
 
         #region SongSubmission
 
-        public void SongSubmissionCreate()
+        public void SongSubmissionCreate(SongSubmission songSubmission)
         {
-
+            
         }
 
         public void SongSubmissionDelete()
@@ -189,14 +227,31 @@ namespace AchordLira.Models.Neo4J
 
         #region SongRequest
 
-        public void SongRequestCreate()
+        public void SongRequestCreate(SongRequest songRequest)
         {
+            //TODO: Proveri da li postiji submission
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("author", songRequest.author);
+            dictionary.Add("artist", songRequest.artist);
+            dictionary.Add("song", songRequest.song);
+            dictionary.Add("date", songRequest.date);
 
+            CypherQuery query = new CypherQuery("CREATE (songrequest:SongRequest { author: {author}, artist: {artist}, song: {song}, date: {date}})",
+                       dictionary, CypherResultMode.Set);
+
+            ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
-        public void SongRequestDelete()
+        public void SongRequestDelete(String artist,String song)
         {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("artist", artist);
+            dictionary.Add("song", song);
 
+            CypherQuery query = new CypherQuery("MATCH (songrequest:SongRequest{artist: {artist}, song: {song}}) DELETE songrequest",
+                       dictionary, CypherResultMode.Set);
+
+            ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
         public void SongRequestUpdate()

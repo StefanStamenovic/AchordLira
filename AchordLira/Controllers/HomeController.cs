@@ -16,7 +16,6 @@ namespace AchordLira.Controllers
             Neo4jDataProvider data = new Neo4jDataProvider();
             User user = new User
             {
-                id="",
                 name="Stefan",
                 email="stefan.stamenovic@gmail.com",
                 link="/User/" + "Stefan",
@@ -70,15 +69,15 @@ namespace AchordLira.Controllers
                     creator="Stefan"
                 },
             };
-            pageModel.songRequests = new List<ViewMessageRequest>
+            pageModel.songRequests = new List<ViewSongRequest>
             {
-                new ViewMessageRequest {
+                new ViewSongRequest {
                     author="Stefan",
                     artist="S.A.R.S",
                     song="Lutka",
                     date=DateTime.Now.ToString("h:mm:ss tt")
                 },
-                new ViewMessageRequest {
+                new ViewSongRequest {
                     author="Stefan",
                     artist="S.A.R.S",
                     song="Perspektiva",
