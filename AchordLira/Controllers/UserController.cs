@@ -1,5 +1,6 @@
 ﻿using AchordLira.Models.Neo4J;
 using AchordLira.Models.Neo4J.Models;
+using AchordLira.Models.Redis;
 using AchordLira.Models.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -14,19 +15,63 @@ namespace AchordLira.Controllers
         // GET: User
         public ActionResult Index()
         {
-            //TODO: Conect data base and get data
             UserPageViewModel pageModel = new UserPageViewModel();
-            var model = pageModel;
-            return View(model);
-        }
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
+                pageModel.user = (ViewUser)(Session["user"]);
 
-        // GET: User/Register
-        public ActionResult Register(string name, string email, string password)
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+            pageModel.genre = null;
+
+            //Getting artists
+            pageModel.artists = dbNeo4j.ArtistRead(pageModel.genre);
+
+            //Getting genres
+            pageModel.genres = dbNeo4j.GenreRead();
+
+            return View(pageModel);
+        }
+        public ActionResult Register(string name, string email, string password, string confirm)
         {
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 return Redirect("/");
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
-            return View();
+            dbNeo4j.UserExists(email, name);
+
+            PageViewModel pageModel = new PageViewModel();
+            pageModel.genre = null;
+
+            //Getting artists
+            pageModel.artists = dbNeo4j.ArtistRead(pageModel.genre);
+
+            //Getting genres
+            pageModel.genres = dbNeo4j.GenreRead();
+            if (name == null && email == null && password == null && confirm == null)
+                return View(pageModel);
+
+            if (password != confirm)
+                ViewBag.error = "Passwords don't match.";
+            if (dbNeo4j.UserExists(email, name))
+                ViewBag.error = "User already exists.Try different email or username.";
+            if (name == null || email == null || password == null || confirm == null)
+                ViewBag.error = "Data is missing from required fields.";
+            else if (name.Length < 1 || email.Length < 5 || password.Length < 5 || confirm.Length < 5)
+                ViewBag.error = "Some fields don't have required length.";
+
+            if (ViewBag.error != null)
+                return View(pageModel);
+
+            User user = new User();
+            user.name = name;
+            user.email = email;
+            user.password = password;
+            user.admin = false;
+            user.date = DateTime.Now.ToString("mm:hh dd-MM-yyyy");
+
+            dbNeo4j.UserCreate(user);
+
+            ViewUser vuser = new ViewUser(user);
+            Session["user"] = vuser;
+            return Redirect("/");
         }
 
         // GET: User/Login
