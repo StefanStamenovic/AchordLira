@@ -9,6 +9,7 @@ namespace AchordLira.Models.ViewModels
     {
         public string name { get; set; }
         public string email { get; set; }
+        public string password { get; set; }
         public string link { get; set; }
         public bool admin { get; set; }
     }

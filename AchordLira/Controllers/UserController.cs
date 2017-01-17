@@ -1,4 +1,6 @@
-﻿using AchordLira.Models.ViewModels;
+﻿using AchordLira.Models.Neo4J;
+using AchordLira.Models.Neo4J.Models;
+using AchordLira.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,16 +27,44 @@ namespace AchordLira.Controllers
             return View(model);
         }
 
-        // GET: User/Login
-        public ActionResult Login()
+        // GET: User/Register
+        public ActionResult Register(string name, string email, string password)
         {
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(User)))
+                return Redirect("/");
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             return View();
         }
 
-        // GET: User/Register
-        public ActionResult Register()
+        // GET: User/Login
+        public ActionResult Login(string email,string password)
         {
-            return View();
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(User)))
+                return Redirect("/");
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+            User user = dbNeo4j.UserRead(email, password);
+            if (user==null)
+            {
+                PageViewModel pageModel = new PageViewModel();
+                pageModel.genre = null;
+
+                //Getting artists
+                pageModel.artists = dbNeo4j.ArtistRead(pageModel.genre);
+
+                //Getting genres
+                pageModel.genres = dbNeo4j.GenreRead();
+                ViewBag.error = "Wrong email or password.";
+                return View(pageModel);
+            }
+            Session["user"] = user;
+            return Redirect("/");
+        }
+
+        public ActionResult Logout()
+        {
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(User)))
+                Session["user"] = null;
+            return Redirect("/");
         }
     }
 }

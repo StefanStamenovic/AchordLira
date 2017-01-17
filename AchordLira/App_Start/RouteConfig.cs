@@ -26,9 +26,15 @@ namespace AchordLira
             );
 
             routes.MapRoute(
+                name: "SongRequest",
+                url: "SongRequest/Create/",
+                defaults: new { controller = "Home", action = "Create"}
+            );
+
+            routes.MapRoute(
                 name: "Default",
-                url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                url: "{controller}/{action}/{genre}",
+                defaults: new { controller = "Home", action = "Index", genre = UrlParameter.Optional }
             );
         }
     }

@@ -7,5 +7,10 @@ namespace AchordLira.Models.Neo4J.Models
 {
     public class Song
     {
+        public string name { get; set; }
+        public string link { get; set; }
+        public string content { get; set; }
+        public string date { get; set; }
+        public bool approved { get; set; }
     }
 }

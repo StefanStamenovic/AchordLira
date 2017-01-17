@@ -5,6 +5,7 @@ using System.Web;
 using Neo4jClient;
 using AchordLira.Models.Neo4J.Models;
 using Neo4jClient.Cypher;
+using AchordLira.Models.ViewModels;
 
 namespace AchordLira.Models.Neo4J
 {
@@ -37,10 +38,11 @@ namespace AchordLira.Models.Neo4J
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             dictionary.Add("name", user.name);
             dictionary.Add("email", user.email);
+            dictionary.Add("password", user.password);
             dictionary.Add("link", user.link);
             dictionary.Add("admin", user.admin);
 
-            CypherQuery query = new CypherQuery("CREATE (user:User { name: {name}, email: {email}, link: {link}, admin: {admin}})",
+            CypherQuery query = new CypherQuery("CREATE (user:User { name: {name}, email: {email}, password: {password}, link: {link}, admin: {admin}})",
                        dictionary, CypherResultMode.Set);
 
             ((IRawGraphClient)client).ExecuteCypher(query);
@@ -64,6 +66,19 @@ namespace AchordLira.Models.Neo4J
         public void UserRead()
         {
 
+        }
+
+        public User UserRead(string email,string password)
+        {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("email", email);
+            dictionary.Add("password", password);
+            CypherQuery query = new CypherQuery("MATCH (user:User{ email: {email}, password: {password}}) RETURN user",
+                           dictionary, CypherResultMode.Set);
+            List<User> result = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList();
+            if (result.Count <= 0)
+                return null;
+            return result.First(); ;
         }
 
         #endregion
@@ -98,9 +113,16 @@ namespace AchordLira.Models.Neo4J
 
         }
 
-        public void GenreRead()
+        public List<string> GenreRead()
         {
+            List<string> result = new List<string>();
+            CypherQuery query = new CypherQuery("MATCH (genre:Genre) RETURN genre",
+                       null, CypherResultMode.Set);
+            List<Genre> qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Genre>(query).ToList();
+            foreach (Genre genre in qres)
+                result.Add(genre.name);
 
+            return result;
         }
 
         #endregion
@@ -146,47 +168,69 @@ namespace AchordLira.Models.Neo4J
 
         }
 
-        public void ArtistRead()
+        public Dictionary<String, List<ViewArtist>> ArtistRead(String genre)
         {
-
-        }
-
-        #endregion
-
-        #region SongSubmission
-
-        public void SongSubmissionCreate(SongSubmission songSubmission)
-        {
-            
-        }
-
-        public void SongSubmissionDelete()
-        {
-
-        }
-
-        public void SongSubmissionUpdate()
-        {
-
-        }
-
-        public void SongSubmissionRead()
-        {
-
+            Dictionary<String, List<ViewArtist>> result = new Dictionary<string, List<ViewArtist>>();
+            for (char c = 'A'; c <= 'Z'; c++)
+            {
+                Dictionary<string, object> dictionary = new Dictionary<string, object>();
+                dictionary.Add("genre_name", genre);
+                dictionary.Add("character", c);
+                CypherQuery query = new CypherQuery("MATCH (artist:Artist)-[relation:BELONG]->(genre:Genre) WHERE substring( lower( artist.name), 0, 1) = {character} AND genre.name = {genre_name} RETURN artist",
+                       dictionary, CypherResultMode.Set);
+                List<Artist> qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Artist>(query).ToList();
+                List<ViewArtist> artists = new List<ViewArtist>();
+                foreach (Artist artist in qres)
+                {
+                    ViewArtist temp = new ViewArtist(artist);
+                    artists.Add(temp);
+                }
+                result.Add(c.ToString(), artists);
+            }
+            return result;
         }
 
         #endregion
 
         #region Song
 
-        public void SongCreate()
+        public void SongCreate(Song song,String user,String artist)
         {
+            //TODO: Proveri da li postoji song i user i artist
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("name", song.name);
+            dictionary.Add("link", song.link);
+            dictionary.Add("content", song.content);
+            dictionary.Add("date", song.date);
+            dictionary.Add("approved", song.approved);
 
+            CypherQuery query = new CypherQuery("CREATE (song:Song { name: {name}, link: {link}, content: {content}, date: {date}, approved: {approved}})",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
+
+            dictionary = new Dictionary<string, object>();
+            dictionary.Add("user_name", user);
+            dictionary.Add("song_name", song.name);
+            query = new CypherQuery("MATCH (user:User{name: {user_name}}),(song:Song{name: {song_name}}) CREATE (user)-[relation:CREATED]->(song)",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
+
+            dictionary = new Dictionary<string, object>();
+            dictionary.Add("song_name", song.name);
+            dictionary.Add("artist_name", artist);
+            query = new CypherQuery("MATCH (song:Song{name: {song_name}}),(artist:Artist{name: {artist_name}}) CREATE (song)-[relation:PERFORMED_BY]->(artist)",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
-        public void SongDelete()
+        public void SongDelete(String name)
         {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("name", name);
 
+            CypherQuery query = new CypherQuery("MATCH (song:Song) WHERE song.name = {name} DETACH DELETE song",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
         public void SongUpdate()
@@ -194,23 +238,74 @@ namespace AchordLira.Models.Neo4J
 
         }
 
-        public void SongRead()
+        public List<ViewSong> SongRead(List<string> songs)
         {
+            List<ViewSong> result=new List<ViewSong>();
+            Dictionary<string, object> dictionary;
+            foreach(string song in songs)
+            {
+                dictionary = new Dictionary<string, object>();
+                dictionary.Add("name", song);
 
+                CypherQuery query = new CypherQuery("MATCH (song:Song { name: {name}) RETURN song",
+                           dictionary, CypherResultMode.Set);
+                List<Song> qresSong= ((IRawGraphClient)client).ExecuteGetCypherResults<Song>(query).ToList();
+
+                query = new CypherQuery("MATCH (user:User)-[relation:CREATED]->(song:Song) WHERE song.name = {name} RETURN user",
+                           dictionary, CypherResultMode.Set);
+                List<User> qresUser = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList();
+                Song resSong = null;
+                if (qresSong.Count > 0)
+                    resSong = qresSong.First();
+                User resUser = null;
+                if (qresUser.Count > 0)
+                    resUser = qresUser.First();
+                ViewSong temp = new ViewSong(resSong, resUser);
+                result.Add(temp);
+            }
+            return result;
         }
 
         #endregion
 
         #region Comment
 
-        public void CommentCreate()
+        public void CommentCreate(Comment comment,String user,String song)
         {
+            //TODO: Treba uzeti novi id i proveriti da li postoje user i song
+            int id = 0;
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("id", id);
+            dictionary.Add("content", comment.content);
+            dictionary.Add("date", comment.date);
 
+            CypherQuery query = new CypherQuery("CREATE (comment:Comment { id: {id}, content: {content}, date: {date}})",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
+
+            dictionary = new Dictionary<string, object>();
+            dictionary.Add("user_name", user);
+            dictionary.Add("comment_id", id);
+            query = new CypherQuery("MATCH (user:User{id: {user_name}}),(comment:Comment{id: {comment_id}}) CREATE (user)-[relation:COMMENTED_BY]->(comment)",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
+
+            dictionary = new Dictionary<string, object>();
+            dictionary.Add("comment_id", id);
+            dictionary.Add("song_name", song);
+            query = new CypherQuery("MATCH (comment:Comment{id: {comment_id}}),(song:Song{name: {song_name}}) CREATE (comment)-[relation:COMMENT_TO]->(song)",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
-        public void CommentDelete()
+        public void CommentDelete(int id)
         {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("id", id);
 
+            CypherQuery query = new CypherQuery("MATCH (comment:Comment) WHERE comment.id = {id} DETACH DELETE comment",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
         public void CommentUpdate()
@@ -259,9 +354,13 @@ namespace AchordLira.Models.Neo4J
 
         }
 
-        public void SongRequestRead()
+        public List<ViewSongRequest> SongRequestRead()
         {
+            CypherQuery query = new CypherQuery("MATCH (songrequest:SongRequest) RETURN songrequest",
+                       null, CypherResultMode.Set);
+            List<ViewSongRequest> result = ((IRawGraphClient)client).ExecuteGetCypherResults<ViewSongRequest>(query).ToList();
 
+            return result;
         }
 
         #endregion

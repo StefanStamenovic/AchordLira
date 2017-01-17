@@ -243,7 +243,7 @@ namespace AchordLira.Models.Redis
             var redisClient = RedisDataLayer.GetClient();
             redisClient.AddItemToSortedSet("songs.popular", id, 0);
             redisClient.IncrementValue("songs.count");
-            redisClient.TrimList("songs.latest", 0, 10);
+            redisClient.TrimList("songs.latest", 0, 4);
             redisClient.PushItemToList("songs.latest", id);
             InsertSearchPhrase(name, false);
         }
