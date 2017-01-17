@@ -63,7 +63,7 @@ namespace AchordLira.Models.Redis
         public void InsertSearchPhrase(string phrase, bool fromBackup)
         {
             var redisClient = RedisDataLayer.GetClient();
-
+    
             //prebacuje u lowercase i razdvaja u reci
             string[] words = phrase.ToLower().Split(' ');
             List<string> partialStrings = new List<string>();
@@ -168,6 +168,7 @@ namespace AchordLira.Models.Redis
         {
             var redisClient = RedisDataLayer.GetClient();
 
+            
             string[] words = text.ToLower().Split(' ');
 
             string[] hashKeys = null;
@@ -175,11 +176,14 @@ namespace AchordLira.Models.Redis
 
             //Ako su uneti samo blanko znaci, obustavi
             if (words.Length == 0)
-                return redisClient.GetAllItemsFromList("user.search." + userID);
+                return null;
             //Ako je u pitanju jedna rec, prosto vrati poklapanja
             else if (words.Length == 1)
             {
-                hashKeys = redisClient.GetRangeFromSortedSet("search." + words[0], 0, -1).ToArray();
+                if (words[0].Length == 1)
+                    return redisClient.GetAllItemsFromList("user.search." + userID);
+                else
+                    hashKeys = redisClient.GetRangeFromSortedSet("search." + words[0], 0, -1).ToArray();
             }
             //
             else

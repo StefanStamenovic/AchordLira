@@ -7,6 +7,7 @@ using AchordLira.Models.ViewModels;
 using AchordLira.Models.Neo4J;
 using AchordLira.Models.Neo4J.Models;
 using AchordLira.Models.Redis;
+using System.Web.Services;
 
 namespace AchordLira.Controllers
 {
@@ -63,6 +64,16 @@ namespace AchordLira.Controllers
             if (genre != null && genre != "")
                 redirectUri += "?genre=" + genre;
             return Redirect(redirectUri);
+        }
+
+
+        [HttpPost]
+        public JsonResult Search(string user, string text)
+        {
+            RedisDataProvider dp = new RedisDataProvider();
+            List<string> results = dp.AutoComplete(user, text);
+            JsonResult inter = Json(results);
+            return inter;
         }
     }
 }
