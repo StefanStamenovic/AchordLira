@@ -7,6 +7,7 @@ using AchordLira.Models.ViewModels;
 using AchordLira.Models.Neo4J;
 using AchordLira.Models.Neo4J.Models;
 using AchordLira.Models.Redis;
+using AchordLira.Models;
 
 namespace AchordLira.Controllers
 {
@@ -17,8 +18,10 @@ namespace AchordLira.Controllers
             HomePageViewModel pageModel = new HomePageViewModel();
 
             //Is loged 
-            if (Session["user"] != null && Session["user"].GetType() == (typeof(User)))
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
+            {
                 pageModel.user = (ViewUser)(Session["user"]);
+            }
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             RedisDataProvider dbRedis = new RedisDataProvider();
 
@@ -52,7 +55,7 @@ namespace AchordLira.Controllers
                 songRequest.author = "Anonymous";
             songRequest.artist = artist;
             songRequest.song = song;
-            songRequest.date = DateTime.Now.ToString("dd-MM-yyyy mm:hh");
+            songRequest.date = DateTime.Now.ToString("mm:hh dd-MM-yyyy"); ;
             if (!artist.Equals("") || !song.Equals(""))
             {
                 Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();

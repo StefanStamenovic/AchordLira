@@ -12,9 +12,9 @@ namespace AchordLira.Models.Neo4J
     public class Neo4jDataProvider
     {
         private GraphClient client;
-        private Uri db_adres = new Uri("http://localhost:7474/db/data");
-        private string user_name = "neo4j";
-        private string password = "Stefan@1994";
+        private Uri db_adres = new Uri("http://localhost:7474/browser/");
+        private string user_name = "ming";
+        private string password = "ming";
         public string erorr = null;
 
         public Neo4jDataProvider()
@@ -41,8 +41,9 @@ namespace AchordLira.Models.Neo4J
             dictionary.Add("password", user.password);
             dictionary.Add("link", user.link);
             dictionary.Add("admin", user.admin);
+            dictionary.Add("date", user.date);
 
-            CypherQuery query = new CypherQuery("CREATE (user:User { name: {name}, email: {email}, password: {password}, link: {link}, admin: {admin}})",
+            CypherQuery query = new CypherQuery("CREATE (user:User { name: {name}, email: {email}, password: {password}, link: {link}, admin: {admin}, date: {date}})",
                        dictionary, CypherResultMode.Set);
 
             ((IRawGraphClient)client).ExecuteCypher(query);
@@ -63,11 +64,6 @@ namespace AchordLira.Models.Neo4J
 
         }
 
-        public void UserRead()
-        {
-
-        }
-
         public User UserRead(string email,string password)
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
@@ -78,7 +74,21 @@ namespace AchordLira.Models.Neo4J
             List<User> result = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList();
             if (result.Count <= 0)
                 return null;
-            return result.First(); ;
+            return result.First();
+        }
+
+        //Search to see if user exists whit given email or password
+        public bool UserExists(string email, string name)
+        {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("email", email);
+            dictionary.Add("name", name);
+            CypherQuery query = new CypherQuery("MATCH (user:User) WHERE user.email = {email} OR user.name = {name} RETURN user",
+                           dictionary, CypherResultMode.Set);
+            List<User> result = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList();
+            if (result.Count <= 0)
+                return false;
+            return true;
         }
 
         #endregion

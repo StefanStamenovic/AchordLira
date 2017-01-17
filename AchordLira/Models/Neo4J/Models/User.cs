@@ -12,5 +12,6 @@ namespace AchordLira.Models.Neo4J.Models
         public String password { get; set; }
         public String link { get; set; }
         public bool admin { get; set; }
+        public String date { get; set; }
     }
 }
