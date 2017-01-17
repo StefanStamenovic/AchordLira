@@ -41,8 +41,9 @@ namespace AchordLira.Models.Neo4J
             dictionary.Add("password", user.password);
             dictionary.Add("link", user.link);
             dictionary.Add("admin", user.admin);
+            dictionary.Add("date", user.date);
 
-            CypherQuery query = new CypherQuery("CREATE (user:User { name: {name}, email: {email}, password: {password}, link: {link}, admin: {admin}})",
+            CypherQuery query = new CypherQuery("CREATE (user:User { name: {name}, email: {email}, password: {password}, link: {link}, admin: {admin}, date: {date})",
                        dictionary, CypherResultMode.Set);
 
             ((IRawGraphClient)client).ExecuteCypher(query);

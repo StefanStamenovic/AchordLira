@@ -16,13 +16,6 @@ namespace AchordLira.Controllers
         {
             //TODO: Conect data base and get data
             UserPageViewModel pageModel = new UserPageViewModel();
-            pageModel.user = new ViewUser
-            {
-                name = "Stefan",
-                email = "stefan.stamenovic@gmail.com",
-                link = "/User/Stefan",
-                admin = true
-            };
             var model = pageModel;
             return View(model);
         }
@@ -30,7 +23,7 @@ namespace AchordLira.Controllers
         // GET: User/Register
         public ActionResult Register(string name, string email, string password)
         {
-            if (Session["user"] != null && Session["user"].GetType() == (typeof(User)))
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 return Redirect("/");
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             return View();
@@ -39,7 +32,7 @@ namespace AchordLira.Controllers
         // GET: User/Login
         public ActionResult Login(string email,string password)
         {
-            if (Session["user"] != null && Session["user"].GetType() == (typeof(User)))
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 return Redirect("/");
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             User user = dbNeo4j.UserRead(email, password);
@@ -53,16 +46,20 @@ namespace AchordLira.Controllers
 
                 //Getting genres
                 pageModel.genres = dbNeo4j.GenreRead();
+
                 ViewBag.error = "Wrong email or password.";
+                if (email == null && password == null)
+                    ViewBag.error = null;
                 return View(pageModel);
             }
-            Session["user"] = user;
+            ViewUser vuser = new ViewUser(user);
+            Session["user"] = vuser;
             return Redirect("/");
         }
 
         public ActionResult Logout()
         {
-            if (Session["user"] != null && Session["user"].GetType() == (typeof(User)))
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 Session["user"] = null;
             return Redirect("/");
         }
