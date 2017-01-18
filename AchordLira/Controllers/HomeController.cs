@@ -25,7 +25,7 @@ namespace AchordLira.Controllers
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             RedisDataProvider dbRedis = new RedisDataProvider();
 
-            if(genre == "All")
+            if (genre == "All")
             {
                 pageModel.genre = null;
             }
@@ -36,9 +36,18 @@ namespace AchordLira.Controllers
 
             //Getting artists
             pageModel.artists = dbNeo4j.ArtistRead(genre);
+            for (char c = 'A'; c <= 'Z'; c++)
+            {
+                if (pageModel.artists.ContainsKey(c.ToString()))
+                {
+                    pageModel.artists[c.ToString()].Sort();
+                }
+            }
 
-            //Getting genres
+
+                    //Getting genres
             pageModel.genres = dbNeo4j.GenreRead();
+            pageModel.genres.Sort();
 
             //Getting popular songs
             List<string> popularSongNames = dbRedis.GetMostPopularSongs(10);
