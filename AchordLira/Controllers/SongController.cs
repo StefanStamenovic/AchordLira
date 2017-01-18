@@ -12,10 +12,42 @@ namespace AchordLira.Controllers
 {
     public class SongController : Controller
     {
-        public ActionResult Index(string artist, string name)
+        public ActionResult Index(string artist, string song,string genre)
         {
-            PageViewModel pageModel = new PageViewModel();
             ViewBag.showNav = true;
+            SongPageViewModel pageModel = new SongPageViewModel();
+            //Is loged 
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
+                pageModel.user = (ViewUser)(Session["user"]);
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+
+            if (genre == "All")
+                pageModel.genre = null;
+            else
+                pageModel.genre = genre;
+
+            //Getting artists
+            pageModel.artists = dbNeo4j.ArtistRead(genre);
+
+            //Getting genres
+            pageModel.genres = dbNeo4j.GenreRead();
+
+            //Getting artist songs
+            pageModel.artistSongs = dbNeo4j.SongReadArtistSongs(artist);
+
+            //Getting song data
+            pageModel.song = dbNeo4j.SongRead(artist,song);
+
+            //Getting song comment
+            pageModel.comments = dbNeo4j.CommentRead(artist, song);
+
+            //Check is song favorite
+            if (pageModel.user != null)
+                pageModel.favorite = dbNeo4j.SongCheckIsFavorite(song, artist, pageModel.user.name);
+
+            pageModel.artist = artist;
+
+            //TODO: Dodaj redis posetu
             return View(pageModel);
         }
         
@@ -156,6 +188,14 @@ namespace AchordLira.Controllers
             return Redirect("/User/");
         }
 
-
+        public ActionResult CreateMessage(string artist, string song,string title,string content)
+        {
+            ViewUser user;
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
+                user = ((ViewUser)Session["user"]);
+            else
+                return Redirect("/");
+            return Redirect("/");
+        }
     }
 }

@@ -5,7 +5,7 @@
 }
 
 <div class="row">
-    @if (Model != null && Model.artist != null)
+    @if (Model != null && Model.song != null && Model.artist != null)
     {
         <div class="col-md-3">
             <div class="panel">
@@ -16,51 +16,61 @@
                 </div>
                 <div class="list-group">
                     @foreach (var song in Model.songs)
-                {
+                    {
                         <a href="#" class="list-group-item">@song.name</a>
                     }
                 </div>
             </div>
         </div>
-    }
-    <div class="col-md-8">
-        @if (Model != null && Model.artist != null && Model.song != null) 
-        {
+        <div class="col-md-8">
             <div class="well" style="padding-left: 40px;">
                 <h3 style="margin-bottom: 0px;">@Model.artist</h3>
                 <h1 class="text-muted" style="margin-top: 0px; margin-bottom: 40px;">@Model.song.name</h1>
                 <h4 style="font-family: monospace; white-space: pre;">@Model.song.content</h4>
             </div>
-        }
-        <div class="col-md-8">
-            <form class="form-horizontal well" style="padding-top: 0px; padding-bottom: 0px;">
-                <div class="form-group" style="margin-top: 15px;">
-                  <div class="col-lg-10">
-                    <input type="text" class="form-control" id="inputEmail" placeholder="Author">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="col-lg-10">
-                    <textarea class="form-control" rows="3" id="textArea" placeholder="Comment text"></textarea>
-                  </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-lg-10">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </div>
-            </form>
-            <hr />
-            <h4>Comments</h4>
-            @foreach (var message in Model.messages)
-            {
+            <div class="col-md-8">
+                @if (Model.user!=null)
+                {
+                    <form class="form-horizontal well" style="padding-top: 0px; padding-bottom: 0px;">
+                        <input name="artist" value="@Model.artist" />
+                        <input name="song" value="@Model.song.name" />
+                        <div class="form-group" style="margin-top: 15px;">
+                            <div class="col-lg-10">
+                                <input type="text" name="title" class="form-control" id="title" placeholder="Title">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-lg-10">
+                                <textarea class="form-control" name="content" rows="3" id="textArea" placeholder="Comment text"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-lg-10">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <h5>You need to be have account to be able to post comment.</h5>
+                }
                 <hr />
-                <blockquote>
-                    <p>@message.content</p>
-                    <small>author <cite title="Source Title">@message.creator</cite></small>
-                </blockquote>
-            }
+                <h4>Comments</h4>
+                @foreach (var comment in Model.comments)
+                {
+                    <hr />
+                    <blockquote>
+                        <p>@comment.content</p>
+                        <small>author <cite title="Source Title">@comment.creator</cite></small>
+                    </blockquote>
+                }
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <h2 class="text-center">There is no song.</h2>
+    }
 </div>
 
