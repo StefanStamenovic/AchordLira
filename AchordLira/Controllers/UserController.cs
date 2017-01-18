@@ -5,7 +5,6 @@ using AchordLira.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 
@@ -37,7 +36,7 @@ namespace AchordLira.Controllers
             pageModel.genres = dbNeo4j.GenreRead();
 
             //Geting user created songs
-            pageModel.userSongs = dbNeo4j.GetUserSongsAndDrafts(pageModel.user.name);
+            pageModel.userSongs = dbNeo4j.SongRead(pageModel.user.name);
 
             //Geting user favorite songs
             pageModel.favoritSongs = dbNeo4j.UserGetFavoriteSongs(pageModel.user.name);
@@ -132,150 +131,25 @@ namespace AchordLira.Controllers
             return Redirect("/");
         }
 
-
-        #region Artist and Genre
-
         public ActionResult CreateGenre(string name)
         {
-
             //Samo admin dodaje zanr
             if (Session["user"] == null || ((ViewUser)Session["user"]).admin == false)
                 return Redirect("/");
 
-
-            if (name == null || name == "")
-            {
-                return Redirect("/User/");
-            }
-
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
 
             List<string> check = dbNeo4j.GenreRead();
-
-            if (check.Contains(name))
-            {
+            if(check.Contains(name))
                 return Redirect("/User/#addGenreModal");
-            }
             else
             {
                 Genre genre = new Genre();
                 genre.name = name;
                 dbNeo4j.GenreCreate(genre);
-                return Redirect("/User/");
+                return Redirect("/User");
             }
 
         }
-
-        public ActionResult DeleteGenre(string name)
-        {
-
-            //Samo admin brise zanr
-            if (Session["user"] == null || ((ViewUser)Session["user"]).admin == false)
-                return Redirect("/");
-
-            if (name == null || name == "")
-            {
-                return Redirect("/User/");
-            }
-
-            
-            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
-
-            List<string> check = dbNeo4j.GenreRead();
-
-            if (!check.Contains(name))
-            {
-                return Redirect("/User/#deleteGenreModal");
-            }
-            else
-            {
-                dbNeo4j.GenreDelete(name);
-                return Redirect("/User/");
-            }
-
-        }
-
-        public ActionResult CreateArtist(string name, string bio, string website, string genres)
-        {
-            //Samo admin dodaje izvodjaca
-            if (Session["user"] == null || ((ViewUser)Session["user"]).admin == false)
-                return Redirect("/");
-
-            if (name == null || name == "" || bio == null || bio == "" || website == null || website == "" || genres == null || genres == "")
-            {
-                return Redirect("/User/");
-            }
-
-            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
-
-            List<string> checkArtists = dbNeo4j.ArtistRead();
-
-            if (checkArtists.Contains(name))
-            {
-                return Redirect("/User/#addArtistModal");
-            }
-            else
-            {
-                string genresClean = Regex.Replace(genres, " *, *", ",");
-                List<string> genreNames = genresClean.Split(',').ToList();
-                List<string> checkGenres = dbNeo4j.GenreRead();
-                List<string> validGenreNames = genreNames.Intersect(checkGenres).ToList();
-                List<Genre> validGenres = new List<Genre>();
-                foreach (string genreName in validGenreNames)
-                {
-                    Genre tmp = new Genre();
-                    tmp.name = genreName;
-                    validGenres.Add(tmp);
-                }
-
-                if(validGenres == null)
-                    return Redirect("/User/");
-
-                Artist artist = new Artist();
-                artist.name = name;
-                artist.biography = bio;
-                artist.website = website;
-                artist.link = "/" + artist;
-                dbNeo4j.ArtistCreate(artist, validGenres);
-                return Redirect("/User/");
-            }
-
-        }
-
-        public ActionResult DeleteArtist(string name)
-        {
-
-
-            //Samo admin brise zanr
-            if (Session["user"] == null || ((ViewUser)Session["user"]).admin == false)
-                return Redirect("/");
-
-
-            if (name == null || name == "")
-            {
-                return Redirect("/User/");
-            }
-
-
-            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
-
-            List<string> check = dbNeo4j.ArtistRead();
-
-            if (!check.Contains(name))
-            {
-                return Redirect("/User/#deleteArtistModal");
-            }
-            else
-            {
-                dbNeo4j.ArtistDelete(name);
-                return Redirect("/User/");
-            }
-        }
-
-        #endregion
-
-        //TODO: Dodaj sve korisnike i mogucnost brisanja
-
-
     }
 }

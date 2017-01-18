@@ -3,7 +3,7 @@
     ViewBag.Title = "User";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<script type="text/javascript" src="~/Scripts/user-utility.js"></script>
+
 <div class="row">
     <div class="col-md-8">
         <ul class="nav nav-tabs">
@@ -95,15 +95,15 @@
                         <li class="list-group-item clearfix">
                             <h4 class="pull-left">Artist</h4>
                             <div class="pull-right">
-                                <a href="#addArtistModal" data-toggle="modal" class="btn btn-default">Add</a>
-                                <a href="#deleteArtistModal" data-toggle="modal" class="btn btn-default">Delete</a>
+                                <a href="#" class="btn btn-default">Add</a>
+                                <a href="#" class="btn btn-default">Delete</a>
                             </div>
                         </li>
                         <li class="list-group-item clearfix">
                             <h4 class="pull-left">Genre</h4>
                             <div class="pull-right">
                                 <a href="#addGenreModal" data-toggle="modal" class="btn btn-default">Add</a>
-                                <a href="#deleteGenreModal" data-toggle="modal" class="btn btn-default">Delete</a>
+                                <a href="#" class="btn btn-default">Delete</a>
                             </div>
                         </li>
                     </ul>
@@ -122,9 +122,8 @@
                 }
             </div>
         </div>
-
        
-        <div class="modal" id="addGenreModal">
+         <div class="modal" id="addGenreModal">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -138,11 +137,6 @@
                                     <label class="col-lg-2 control-label">Genre Name:</label>
                                     <div class="col-lg-10">
                                         <input type="text" class="form-control" id="name" name="name" placeholder="Example: Ska">
-                                        <span id="genreExistsError" class="field-validation-valid text-danger"
-                                              data-valmsg-for="name"
-                                              data-valmsg-replace="true">
-                                            Genre already exists.
-                                        </span>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -156,127 +150,6 @@
                 </div>
             </div>
         </div>
-
-
-        <div class="modal" id="deleteGenreModal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title">Delete Genre</h4>
-                    </div>
-                    <div class="modal-body">
-                        <form class="form-horizontal" action="DeleteGenre/" method="get">
-                            <fieldset>
-                                <div class="form-group">
-                                    <label class="col-lg-2 control-label">Genre Name:</label>
-                                    <div class="col-lg-10">
-                                        <input type="text" class="form-control" id="name" name="name" placeholder="Example: Ska">
-                                        <span id="genreNotExistError" class="field-validation-valid text-danger"
-                                              data-valmsg-for="name"
-                                              data-valmsg-replace="true">
-                                            Genre doesn't exist.
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-lg-10 col-lg-offset-2">
-                                        <button type="submit" class="btn btn-primary pull-right">Delete</button>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="modal" id="addArtistModal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title">Create Artist</h4>
-                    </div>
-                    <div class="modal-body">
-                        <form class="form-horizontal" action="CreateArtist/" method="get">
-                            <fieldset>
-                                <div class="form-group">
-                                    <label class="col-lg-2 control-label">Artist Name:</label>
-                                    <div class="col-lg-10">
-                                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name">
-                                        <span id="artistExistsError" class="field-validation-valid text-danger"
-                                              data-valmsg-for="name"
-                                              data-valmsg-replace="true">
-                                            Artist already exists.
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-lg-2 control-label">Artist Biography:</label>
-                                    <div class="col-lg-10">
-                                        <input type="text" class="form-control" id="bio" name="bio" placeholder="A Short Bio...">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-lg-2 control-label">Artist Website:</label>
-                                    <div class="col-lg-10">
-                                        <input type="text" class="form-control" id="website" name="website" placeholder="Website or Wikipedia">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-lg-2 control-label">Artist Genres:</label>
-                                    <div class="col-lg-10">
-                                        <input type="text" class="form-control" id="genres" name="genres" placeholder="Example: Pop,Rock,Funk">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-lg-10 col-lg-offset-2">
-                                        <button type="submit" class="btn btn-primary pull-right">Create</button>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="modal" id="deleteArtistModal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title">Delete Artist</h4>
-                    </div>
-                    <div class="modal-body">
-                        <form class="form-horizontal" action="DeleteArtist/" method="get">
-                            <fieldset>
-                                <div class="form-group">
-                                    <label class="col-lg-2 control-label">Artist Name:</label>
-                                    <div class="col-lg-10">
-                                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name">
-                                        <span id="artistNotExistError" class="field-validation-valid text-danger"
-                                              data-valmsg-for="name"
-                                              data-valmsg-replace="true">
-                                            Artist doesn't exist.
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-lg-10 col-lg-offset-2">
-                                        <button type="submit" class="btn btn-primary pull-right">Delete</button>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 </div>
 
