@@ -125,5 +125,26 @@ namespace AchordLira.Controllers
                 Session["user"] = null;
             return Redirect("/");
         }
+
+        public ActionResult CreateGenre(string name)
+        {
+            //Samo admin dodaje zanr
+            if (Session["user"] == null || ((ViewUser)Session["user"]).admin == false)
+                return Redirect("/");
+
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+
+            List<string> check = dbNeo4j.GenreRead();
+            if(check.Contains(name))
+                return Redirect("/User/#addGenreModal");
+            else
+            {
+                Genre genre = new Genre();
+                genre.name = name;
+                dbNeo4j.GenreCreate(genre);
+                return Redirect("/User");
+            }
+
+        }
     }
 }

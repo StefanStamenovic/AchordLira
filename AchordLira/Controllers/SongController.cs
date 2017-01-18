@@ -86,6 +86,16 @@ namespace AchordLira.Controllers
 
         public ActionResult Delete(string artist, string name)
         {
+            ViewUser user;
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
+                user = ((ViewUser)Session["user"]);
+            else
+                return Redirect("/");
+
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+            RedisDataProvider dbRedis = new RedisDataProvider();
+
+            dbNeo4j.SongRemoveFromFavorites(name, artist, user.name);
 
             return Redirect("/User/");
         }
