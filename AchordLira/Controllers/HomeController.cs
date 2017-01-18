@@ -98,5 +98,18 @@ namespace AchordLira.Controllers
                 redirectUri += "?genre=" + genre;
             return Redirect(redirectUri);
         }
+
+        [HttpPost]
+        public JsonResult Search (string text)
+        {
+            RedisDataProvider dp = new RedisDataProvider();
+            string user = null;
+            if (Session["user"] != null)
+                user = ((ViewUser)Session["user"]).name;
+            List<string> results = dp.AutoComplete(user, text);
+            JsonResult inter = Json(results);
+            return inter;
+        }
+
     }
 }

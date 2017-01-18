@@ -289,8 +289,14 @@ namespace AchordLira.Controllers
 
         #endregion
 
-        //TODO: Dodaj sve korisnike i mogucnost brisanja
 
+        [HttpPost]
+        public ActionResult RefreshSubmissions()
+        {
+            RedisDataProvider dp = new RedisDataProvider();
+            dp.ClearAdminNotifications();
+            return new HttpStatusCodeResult(200);
+        }
 
     }
 }

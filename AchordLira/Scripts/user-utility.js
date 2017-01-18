@@ -48,6 +48,21 @@
         $('#deleteArtistModal').modal();
         $('#artistNotExistError').show();
     }
+
+
+    $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function () {
+        $.ajax({
+            type: "POST",
+            url: '/User/RefreshSubmissions',
+            contentType: "application/json; charset=utf-8",
+            async: true,
+            success: function () {
+                $('#notificationsCount').hide();
+            },
+            error: function () { alert('Error') },
+            failure: function () { alert('Failure') }
+        });
+    })
 };
 
 

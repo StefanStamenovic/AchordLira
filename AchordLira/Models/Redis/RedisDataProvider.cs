@@ -179,7 +179,10 @@ namespace AchordLira.Models.Redis
             //Ako je u pitanju jedna rec, prosto vrati poklapanja
             else if (words.Length == 1)
             {
-                hashKeys = redisClient.GetRangeFromSortedSet("search." + words[0], 0, -1).ToArray();
+                if (words[0].Length == 1 && userID != null)
+                    return redisClient.GetAllItemsFromList("user.search." + userID);
+                else
+                    hashKeys = redisClient.GetRangeFromSortedSet("search." + words[0], 0, -1).ToArray();
             }
             //
             else
