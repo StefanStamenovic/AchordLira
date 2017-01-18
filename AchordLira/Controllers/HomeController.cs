@@ -25,7 +25,14 @@ namespace AchordLira.Controllers
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             RedisDataProvider dbRedis = new RedisDataProvider();
 
-            pageModel.genre = genre;
+            if(genre == "All")
+            {
+                pageModel.genre = null;
+            }
+            else
+            {
+                pageModel.genre = genre;
+            }
 
             //Getting artists
             pageModel.artists = dbNeo4j.ArtistRead(genre);

@@ -131,6 +131,7 @@
                             <ul class="dropdown-menu" role="menu">
                                 @if (Model != null && Model.genres != null)
                                 {
+                                    <li><a href="/?genre=All">All</a></li>
                                     foreach (String genre in Model.genres)
                                     {
                                         <li><a href="/?genre=@genre">@genre</a></li>

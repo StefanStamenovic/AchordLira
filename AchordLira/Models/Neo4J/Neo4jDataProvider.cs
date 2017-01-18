@@ -150,7 +150,7 @@ namespace AchordLira.Models.Neo4J
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             dictionary.Add("name", name);
 
-            CypherQuery query = new CypherQuery("MATCH (genre:Genre) WHERE genre.name = {name} DELETE genre",
+            CypherQuery query = new CypherQuery("MATCH (genre:Genre) WHERE genre.name = {name} DETACH DELETE genre",
                        dictionary, CypherResultMode.Set);
 
             ((IRawGraphClient)client).ExecuteCypher(query);
@@ -179,7 +179,6 @@ namespace AchordLira.Models.Neo4J
 
         public void ArtistCreate(Artist artist, List<Genre> genres)
         {
-            //TODO: Proveri da li postoji izvodjaci i zanar
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             dictionary.Add("name", artist.name);
             dictionary.Add("link", artist.link);
@@ -201,7 +200,7 @@ namespace AchordLira.Models.Neo4J
             }
         }
 
-        public void ArtistrDelete(String name)
+        public void ArtistDelete(String name)
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             dictionary.Add("name", name);
@@ -222,10 +221,21 @@ namespace AchordLira.Models.Neo4J
             for (char c = 'A'; c <= 'Z'; c++)
             {
                 Dictionary<string, object> dictionary = new Dictionary<string, object>();
-                dictionary.Add("genre_name", genre);
                 dictionary.Add("character", c);
-                CypherQuery query = new CypherQuery("MATCH (artist:Artist)-[relation:BELONG]->(genre:Genre) WHERE substring( lower( artist.name), 0, 1) = {character} AND genre.name = {genre_name} RETURN artist",
+                CypherQuery query;
+                if (genre != null)
+                {
+                    dictionary.Add("genre_name", genre);
+                    query = new CypherQuery("MATCH (artist:Artist)-[relation:BELONG]->(genre:Genre) WHERE artist.name STARTS WITH {character} AND genre.name = {genre_name} RETURN artist",
                        dictionary, CypherResultMode.Set);
+                }
+                else
+                {
+                    query = new CypherQuery("MATCH (artist:Artist) WHERE artist.name STARTS WITH {character} RETURN artist",
+                       dictionary, CypherResultMode.Set);
+                }
+                
+                
                 List<Artist> qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Artist>(query).ToList();
                 List<ViewArtist> artists = new List<ViewArtist>();
                 foreach (Artist artist in qres)
@@ -235,6 +245,18 @@ namespace AchordLira.Models.Neo4J
                 }
                 result.Add(c.ToString(), artists);
             }
+            return result;
+        }
+
+        public List<string> ArtistRead()
+        {
+            List<string> result = new List<string>();
+            CypherQuery query = new CypherQuery("MATCH (artist:Artist) RETURN artist",
+                       null, CypherResultMode.Set);
+            List<Artist> qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Artist>(query).ToList();
+            foreach (Artist artist in qres)
+                result.Add(artist.name);
+
             return result;
         }
 
