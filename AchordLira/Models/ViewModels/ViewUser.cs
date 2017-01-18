@@ -21,5 +21,9 @@ namespace AchordLira.Models.ViewModels
             admin = user.admin;
             date = user.date;
         }
+
+        public ViewUser()
+        {
+        }
     }
 }

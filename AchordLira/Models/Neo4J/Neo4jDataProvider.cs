@@ -53,8 +53,11 @@ namespace AchordLira.Models.Neo4J
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             dictionary.Add("name", name);
-
-            CypherQuery query = new CypherQuery("MATCH (user:User) WHERE user.name = {name} DELETE user",
+            dictionary.Add("admin_name", "admin");
+            CypherQuery query = new CypherQuery("MATCH (user:User)-[relation:CREATED]->(song:Song) WHERE user.name = {name} WITH song MATCH (admin:User) WHERE admin.name = {admin_name} CREATE (admin)-[relation:CREATED]->(song) ",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
+            query = new CypherQuery("MATCH (user:User)-[relation:CREATED]->(song:Song) WHERE user.name = {name} DETACH DELETE user ",
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
         }
@@ -75,6 +78,28 @@ namespace AchordLira.Models.Neo4J
             if (result.Count <= 0)
                 return null;
             return result.First();
+        }
+
+        public List<ViewUser> UserRead()
+        {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("true", "true");
+
+            CypherQuery query = new CypherQuery("MATCH (user:User) WHERE NOT user.admin = {true} RETURN user",
+                           dictionary, CypherResultMode.Set);
+            List<User> result = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList();
+            List<ViewUser> users = new List<ViewUser>();
+            foreach (User user in result)
+            {
+                ViewUser tmp = new ViewUser();
+                tmp.date = user.date;
+                tmp.name = user.name;
+                tmp.email = user.email;
+                tmp.admin = user.admin;
+                tmp.link = user.link;
+                users.Add(tmp);
+            }
+            return users;
         }
 
         //Search to see if user exists whit given email or password
@@ -393,8 +418,6 @@ namespace AchordLira.Models.Neo4J
             query = new CypherQuery("MATCH (song:Song{name: {song_name}}),(artist:Artist{name: {artist_name}}) CREATE (song)-[relation:PERFORMED_BY]->(artist)",
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
-
-            SongRequestDelete(artist, song.name);
         }
 
         public void SongDelete(String artis, String name, String user)
@@ -584,13 +607,14 @@ namespace AchordLira.Models.Neo4J
             ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
-        public void SongRequestDelete(String artist,String song)
+        public void SongRequestDelete(String artist,String song, String author)
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             dictionary.Add("artist", artist);
             dictionary.Add("song", song);
+            dictionary.Add("author", author);
 
-            CypherQuery query = new CypherQuery("MATCH (songrequest:SongRequest{artist: {artist}, song: {song}}) DELETE songrequest",
+            CypherQuery query = new CypherQuery("MATCH (songrequest:SongRequest{artist: {artist}, song: {song}, author: {author}}) DELETE songrequest",
                        dictionary, CypherResultMode.Set);
 
             ((IRawGraphClient)client).ExecuteCypher(query);
@@ -606,8 +630,10 @@ namespace AchordLira.Models.Neo4J
             CypherQuery query = new CypherQuery("MATCH (songrequest:SongRequest) RETURN songrequest",
                        null, CypherResultMode.Set);
             List<ViewSongRequest> result = ((IRawGraphClient)client).ExecuteGetCypherResults<ViewSongRequest>(query).ToList();
-
-            return result;
+            //uzmi najskorijih 7(ili manje ako ih nema toliko)
+            List<ViewSongRequest> oredered = result.OrderBy(o => o.date).ToList().GetRange(0, 7 <= result.Count ? 7 : result.Count);
+            oredered.Reverse();
+            return oredered;
         }
 
         #endregion

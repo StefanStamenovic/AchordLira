@@ -37,9 +37,19 @@
             <div class="panel-body">
                 @foreach (ViewSongRequest request in Model.songRequests)
                 {
-                    <div class="alert alert-dismissible alert" style="margin-bottom: 2px; padding-top: 2px; padding-bottom: 2px;">
-                        <strong>@request.artist - @request.song</strong> requested by <strong>@request.author</strong> 
-                        <hr style="margin-bottom: 10px; margin-top: 10px;"/>
+                    <div class="alert alert-dismissible alert clearfix" style="margin-bottom: 2px; padding-top: 2px; padding-bottom: 2px;">
+                        @if (Model.user != null && Model.user.admin)
+                        {
+                            <a href="/SongRequest/Delete/?artist=@request.artist&song=@request.song&author=@request.author&genre=@Model.genre" 
+                               data-toggle="tooltip" title="Click to remove">
+                                <strong>@request.artist - @request.song</strong> requested by <strong>@request.author</strong>
+                            </a>
+                        }
+                        else
+                        {
+                            <p><strong>@request.artist - @request.song</strong> requested by <strong>@request.author</strong></p>
+                        }
+                        <hr style="margin-bottom: 10px; margin-top: 10px;" />
                     </div>
                 }
             </div>

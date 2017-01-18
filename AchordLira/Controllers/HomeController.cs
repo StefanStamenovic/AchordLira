@@ -45,7 +45,7 @@ namespace AchordLira.Controllers
             }
 
 
-                    //Getting genres
+            //Getting genres
             pageModel.genres = dbNeo4j.GenreRead();
             pageModel.genres.Sort();
 
@@ -79,6 +79,20 @@ namespace AchordLira.Controllers
                 dbNeo4j.SongRequestCreate(songRequest);
             }
 
+            string redirectUri = "/";
+            if (genre != null && genre != "")
+                redirectUri += "?genre=" + genre;
+            return Redirect(redirectUri);
+        }
+
+        public ActionResult Delete(string artist, string song, string author, string genre)
+        {
+            //Samo admin moze da obrise request
+            if (Session["user"] == null || ((ViewUser)Session["user"]).admin == false)
+                return Redirect("/");
+
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+            dbNeo4j.SongRequestDelete(artist, song, author);
             string redirectUri = "/";
             if (genre != null && genre != "")
                 redirectUri += "?genre=" + genre;

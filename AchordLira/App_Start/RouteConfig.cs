@@ -14,9 +14,15 @@ namespace AchordLira
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
-                name: "SongRequest",
+                name: "SongRequestCreate",
                 url: "SongRequest/Create/",
                 defaults: new { controller = "Home", action = "Create"}
+            );
+
+            routes.MapRoute(
+                name: "SongRequestDelete",
+                url: "SongRequest/Delete/",
+                defaults: new { controller = "Home", action = "Delete" }
             );
 
             routes.MapRoute(

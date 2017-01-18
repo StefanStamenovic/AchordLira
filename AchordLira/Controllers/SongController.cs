@@ -73,6 +73,15 @@ namespace AchordLira.Controllers
 
             if (approve != null)
             {
+                //Provera da li postoji Artist
+                List<string> allArtists = dbNeo4j.ArtistRead();
+                if (!allArtists.Contains(artist))
+                {
+                    ViewBag.noArtist = true;
+                    ViewBag.draft = dbNeo4j.SongDraftRead(user, artist, name);
+                    return View(pageModel);
+                }
+
                 //Promenjeni podatci
                 ViewSong draft = new ViewSong();
                 draft.creator = user;
@@ -99,6 +108,7 @@ namespace AchordLira.Controllers
                 song.content = content;
                 song.date= DateTime.Now.ToString("mm:hh dd-MM-yyyy");
                 song.link = "/" + artist + "/" + user + "/";
+
                 dbNeo4j.SongCreate(song, user, artist);
                 SongDraft songDraft = new SongDraft();
                 songDraft.name = name;
@@ -125,7 +135,7 @@ namespace AchordLira.Controllers
             draft.name = name;
 
             dbNeo4j.SongDraftDelete(draft,user);
-            dbRedis.RemoveAdminNotification();
+            dbRedis.ClearAdminNotifications();
 
             return Redirect("/User/");
         }

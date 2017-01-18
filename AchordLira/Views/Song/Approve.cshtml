@@ -24,6 +24,14 @@
                         <input type="hidden" name="approve" value="true" />
                         <div class="col-lg-10">
                             <input type="text" name="artist" class="form-control" id="artist" placeholder="" value="@ViewBag.draft.artist">
+                            @if (ViewBag.noArtist != null && ViewBag.noArtist)
+                            {
+                                <span class="field-validation-valid text-danger"
+                                      data-valmsg-for="artist"
+                                      data-valmsg-replace="true">
+                                    Artist doesn't exist. Create the artist first.
+                                </span>
+                            }
                         </div>
                     </div>
                     <div class="form-group">

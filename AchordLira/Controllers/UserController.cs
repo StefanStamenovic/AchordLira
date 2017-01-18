@@ -48,6 +48,9 @@ namespace AchordLira.Controllers
             //Geting user admin request songs
             pageModel.requestedSongs = dbNeo4j.SongDraftRead();
 
+            //User List
+            pageModel.userList = dbNeo4j.UserRead();
+
             ViewBag.showNav = true;
             return View(pageModel);
         }
@@ -130,6 +133,18 @@ namespace AchordLira.Controllers
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 Session["user"] = null;
             return Redirect("/");
+        }
+
+        public ActionResult Delete(string name)
+        {
+            //Samo admin moze da obrise korisnika
+            if (Session["user"] == null || ((ViewUser)Session["user"]).admin == false)
+                return Redirect("/");
+
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+            dbNeo4j.UserDelete(name);
+
+            return Redirect("/User/");
         }
 
 
