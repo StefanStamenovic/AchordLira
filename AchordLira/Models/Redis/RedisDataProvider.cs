@@ -226,6 +226,7 @@ namespace AchordLira.Models.Redis
             redisClient.IncrementItemInSortedSet("songs.popular", id, 1);
         }
 
+        //TODO: dodaj artist.popular/latest i vracaj dictionary
         public List<string> GetMostPopularSongs(int number)
         {
             var redisClient = RedisDataLayer.GetClient();
@@ -278,10 +279,12 @@ namespace AchordLira.Models.Redis
             return redisClient.GetValue("genres.count");
         }
 
-        public void ClearAdminNotifications()
+        public void RemoveAdminNotification()
         {
             var redisClient = RedisDataLayer.GetClient();
-            redisClient.SetValue("admin.notification.count", "0");
+            redisClient.DecrementValue("admin.notification.count");
+            if (int.Parse(redisClient.GetValue("admin.notification.count")) < 0)
+                redisClient.SetValue("admin.notification.count", "0");
         }
 
         public void AddAdminNotification()

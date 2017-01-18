@@ -18,8 +18,15 @@ namespace AchordLira.Controllers
             UserPageViewModel pageModel = new UserPageViewModel();
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 pageModel.user = (ViewUser)(Session["user"]);
+            else
+                return Redirect("/");
+
+            pageModel.user = (ViewUser)(Session["user"]);
 
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+            RedisDataProvider dbRedis = new RedisDataProvider();
+        
+
             pageModel.genre = null;
 
             //Getting artists
@@ -27,6 +34,16 @@ namespace AchordLira.Controllers
 
             //Getting genres
             pageModel.genres = dbNeo4j.GenreRead();
+
+            //Geting user created songs
+            pageModel.userSongs = dbNeo4j.SongRead(pageModel.user.name);
+
+            //Geting user favorite songs
+            pageModel.favoritSongs = dbNeo4j.UserGetFavoriteSongs(pageModel.user.name);
+
+            pageModel.adminNotifications = dbRedis.GetAdminNotificationsCount();
+
+            pageModel.requestedSongs = dbNeo4j.SongDraftRead();
 
             return View(pageModel);
         }
