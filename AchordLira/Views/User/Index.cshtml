@@ -29,17 +29,22 @@
                             <li class="list-group-item clearfix">
                                 @if (song.approved)
                                 {
-                                    <a href="@song.link" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
+                                    <a href="/Song/?artist=@song.artist&song=@song.name" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
                                 }
                                 else
                                 {
                                     <a class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
                                     <div class="pull-right">
-                                        <p>Pending Approval</p>
+                                        <span class="badge" style="margin-right: 10px; margin-top: 10px; background-color: #ff4136; color: white">Pending approval</span>
                                     </div>
                                 }
                                 
                             </li>
+                        }
+                        @if(Model.userSongs.Count<1)
+                        {
+                            <hr />
+                            <h4>There is no songs created by you.</h4>
                         }
                     </ul>
                 </div>
@@ -51,11 +56,16 @@
                             @foreach (ViewSong song in Model.favoritSongs)
                             {
                                 <li class="list-group-item clearfix">
-                                    <a href="@song.link" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
+                                    <a href="/Song/?artist=@song.artist&song=@song.name" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
                                     <div class="pull-right">
                                         <a href="/Song/Delete?artist=@song.artist&song=@song.name" class="btn btn-default">Delete</a>
                                     </div>
                                 </li>
+                            }
+                            @if (Model.favoritSongs.Count < 1)
+                            {
+                                <hr />
+                                <h4>You don't have favorite songs.</h4>
                             }
                         </ul>
                     </div>
@@ -79,6 +89,11 @@
                                         </div>
                                     </li>
                                 }
+                                @if (Model.requestedSongs.Count < 1)
+                                {
+                                    <hr />
+                                    <h4>There is no user song submissions.</h4>
+                                }
                             </ul>
                         </div>
                     </div>
@@ -91,7 +106,7 @@
                                 @foreach (ViewUser user in Model.userList)
                                 {
                                     <li class="list-group-item clearfix">
-                                        <a>@user.name</a>
+                                        <a href="/User/Profile/?user=@user.name" class="h4 link pull-left" style="text-decoration: none;">@user.name</a>
                                         <div class="pull-right">
                                             <a href="/User/Delete?name=@user.name" class="btn btn-default">Delete</a>
                                         </div>

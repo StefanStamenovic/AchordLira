@@ -188,14 +188,24 @@ namespace AchordLira.Controllers
             return Redirect("/User/");
         }
 
-        public ActionResult CreateMessage(string artist, string song,string title,string content)
+        public ActionResult CreateComment(string artist, string song,string title,string content)
         {
             ViewUser user;
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 user = ((ViewUser)Session["user"]);
             else
                 return Redirect("/");
-            return Redirect("/");
+
+            Comment comment = new Comment();
+            comment.title = title;
+            comment.content = content;
+            comment.date=DateTime.Now.ToString("mm:hh dd-MM-yyyy");
+
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+
+            dbNeo4j.CommentCreate(comment, user.name, artist, song);
+
+            return Redirect("/Song/?artist=" + artist + "&song=" + song);
         }
     }
 }

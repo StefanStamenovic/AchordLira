@@ -63,6 +63,10 @@
             failure: function () { alert('Failure') }
         });
     })
+
+    if ($('#notificationsCount').html() == '0') {
+        $('#notificationsCount').hide();
+    }
 };
 
 

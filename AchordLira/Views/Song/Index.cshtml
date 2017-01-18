@@ -15,7 +15,7 @@
                     </div>
                 </div>
                 <div class="list-group">
-                    @foreach (var song in Model.songs)
+                    @foreach (var song in Model.artistSongs)
                     {
                         <a href="#" class="list-group-item">@song.name</a>
                     }
@@ -31,9 +31,9 @@
             <div class="col-md-8">
                 @if (Model.user!=null)
                 {
-                    <form class="form-horizontal well" style="padding-top: 0px; padding-bottom: 0px;">
-                        <input name="artist" value="@Model.artist" />
-                        <input name="song" value="@Model.song.name" />
+                    <form class="form-horizontal well" action="/Song/CreateComment/"  method="get" style="padding-top: 0px; padding-bottom: 0px;">
+                        <input type="hidden" name="artist" value="@Model.artist" />
+                        <input type="hidden" name="song" value="@Model.song.name" />
                         <div class="form-group" style="margin-top: 15px;">
                             <div class="col-lg-10">
                                 <input type="text" name="title" class="form-control" id="title" placeholder="Title">

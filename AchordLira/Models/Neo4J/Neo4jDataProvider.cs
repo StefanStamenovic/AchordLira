@@ -83,9 +83,9 @@ namespace AchordLira.Models.Neo4J
         public List<ViewUser> UserRead()
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            dictionary.Add("true", "true");
+            dictionary.Add("true", true);
 
-            CypherQuery query = new CypherQuery("MATCH (user:User) WHERE NOT user.admin = {true} RETURN user",
+            CypherQuery query = new CypherQuery("MATCH (user:User) WHERE user.admin <> {true} RETURN user",
                            dictionary, CypherResultMode.Set);
             List<User> result = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList();
             List<ViewUser> users = new List<ViewUser>();
@@ -240,6 +240,7 @@ namespace AchordLira.Models.Neo4J
 
         }
 
+        //Vraca sve artiste po zanru
         public Dictionary<String, List<ViewArtist>> ArtistRead(String genre)
         {
             Dictionary<String, List<ViewArtist>> result = new Dictionary<string, List<ViewArtist>>();
@@ -281,7 +282,6 @@ namespace AchordLira.Models.Neo4J
             List<Artist> qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Artist>(query).ToList();
             foreach (Artist artist in qres)
                 result.Add(artist.name);
-
             return result;
         }
 
@@ -436,6 +436,7 @@ namespace AchordLira.Models.Neo4J
         {
 
         }
+
         public List<ViewSong> SongRead(String user)
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
@@ -477,6 +478,7 @@ namespace AchordLira.Models.Neo4J
             }
             return result;
         }
+
         public List<ViewSong> SongRead(List<string> songs)
         {
             List<ViewSong> result=new List<ViewSong>();
@@ -560,7 +562,7 @@ namespace AchordLira.Models.Neo4J
             dictionary.Add("artist_name", artist);
             dictionary.Add("song_name", song);
             dictionary.Add("user_name", user);
-            CypherQuery query = new CypherQuery("MATCH (user:User)-[relation:FAVORITE]->(song:Song) WHERE song.name = {song_name} AND artist.name = {artist_name} and user.name = {user_name}  RETURN {song}",
+            CypherQuery query = new CypherQuery("MATCH (user:User)-[relation:FAVORITE]->(song:Song)-[relation1:PERFORMED_BY]->(artist:Artist) WHERE song.name = {song_name} AND artist.name = {artist_name} and user.name = {user_name}  RETURN {song}",
                    dictionary, CypherResultMode.Set);
             Song qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Song>(query).ToList().FirstOrDefault();
             if (qres == null)
@@ -572,15 +574,16 @@ namespace AchordLira.Models.Neo4J
 
         #region Comment
 
-        public void CommentCreate(Comment comment,String user,String song)
+        public void CommentCreate(Comment comment,String user, String artist,String song)
         {
             int id = GetCommentId();
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             dictionary.Add("id", id);
+            dictionary.Add("title", comment.title);
             dictionary.Add("content", comment.content);
             dictionary.Add("date", comment.date);
 
-            CypherQuery query = new CypherQuery("CREATE (comment:Comment { id: {id}, content: {content}, date: {date}})",
+            CypherQuery query = new CypherQuery("CREATE (comment:Comment { id: {id}, title: {title}, content: {content}, date: {date}})",
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
 
@@ -594,7 +597,8 @@ namespace AchordLira.Models.Neo4J
             dictionary = new Dictionary<string, object>();
             dictionary.Add("comment_id", id);
             dictionary.Add("song_name", song);
-            query = new CypherQuery("MATCH (comment:Comment{id: {comment_id}}),(song:Song{name: {song_name}}) CREATE (comment)-[relation:COMMENT_TO]->(song)",
+            dictionary.Add("artist_name", artist);
+            query = new CypherQuery("MATCH (comment:Comment{id: {comment_id}}) WITH comment MATCH (song:Song)-[relation1:PERFORMED_BY]->(artist:Artist) WHERE song.name = {song_name} AND artist.name = {artist_name} CREATE (comment)-[relation:COMMENT_TO]->(song)",
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
         }
