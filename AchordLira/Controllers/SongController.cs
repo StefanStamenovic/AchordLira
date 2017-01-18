@@ -15,12 +15,14 @@ namespace AchordLira.Controllers
         public ActionResult Index(string artist, string name)
         {
             PageViewModel pageModel = new PageViewModel();
+            ViewBag.showNav = true;
             return View(pageModel);
         }
         
         
         public ActionResult Create(string artist, string song, string content)
         {
+            ViewBag.showNav = false;
             PageViewModel pageModel = new PageViewModel();
 
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
@@ -57,12 +59,56 @@ namespace AchordLira.Controllers
         }
 
         //Prikazuje pesmu adminu i daje opciju izmeni i potvrde 
-        public ActionResult Approve(string artist,string name)
+        public ActionResult Approve(string user,string artist,string name,string content,string approve)
         {
+            ViewBag.showNav = false;
             //Samo admin moze da appruvuje
             if (Session["user"] == null || ((ViewUser)Session["user"]).admin == false)
                 return Redirect("/");
+
             PageViewModel pageModel = new PageViewModel();
+            pageModel.user = (ViewUser)(Session["user"]);
+
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+
+            if (approve != null)
+            {
+                //Promenjeni podatci
+                ViewSong draft = new ViewSong();
+                draft.creator = user;
+                draft.name = name;
+                draft.content = content;
+                draft.artist = artist;
+                draft.approved = false;
+                draft.date= DateTime.Now.ToString("mm:hh dd-MM-yyyy");
+
+                ViewBag.draft = draft;
+                if (artist == null && name == null && content == null)
+                    return View(pageModel);
+                if (artist == null || name == null || content == null)
+                    ViewBag.error = "Data is missing from required fields.";
+                else if (artist.Length < 1 || name.Length < 1 || content.Length < 1)
+                    ViewBag.error = "Data is missing from required fields.";
+
+                if (ViewBag.error != null)
+                    return View(pageModel);
+
+                //Kriranje nove pesme
+                Song song = new Song();
+                song.name = name;
+                song.content = content;
+                song.date= DateTime.Now.ToString("mm:hh dd-MM-yyyy");
+                song.link = "/" + artist + "/" + user + "/";
+                dbNeo4j.SongCreate(song, user, artist);
+                SongDraft songDraft = new SongDraft();
+                songDraft.name = name;
+                songDraft.artist = artist;
+                dbNeo4j.SongDraftDelete(songDraft, user);
+
+                return Redirect("/User/");
+            }
+            ViewBag.draft = dbNeo4j.SongDraftRead(user, artist, name);
+
             return View(pageModel);
         }
 

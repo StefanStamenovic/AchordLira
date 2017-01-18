@@ -73,7 +73,7 @@
                                         <a class="h4 link pull-left" style="text-decoration: none;">@draft.artist - @draft.name</a>
                                         <div class="pull-right">
                                             <strong style="display: inline-block; padding-right: 10px">@draft.creator</strong>
-                                            <a href="/Song/Edit/?artist=@draft.artist&name=@draft.name" class="btn btn-default">View</a>
+                                            <a href="/Song/Approve/?user=@draft.creator&artist=@draft.artist&name=@draft.name" class="btn btn-default">View</a>
                                             <a href="/Song/DeleteDraft/?user=@draft.creator&artist=@draft.artist&name=@draft.name" class="btn btn-default">Delete</a>
                                         </div>
                                     </li>

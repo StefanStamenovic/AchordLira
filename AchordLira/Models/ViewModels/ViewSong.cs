@@ -37,5 +37,9 @@ namespace AchordLira.Models.ViewModels
             creator = user;
             this.artist = draft.artist;
         }
+
+        public ViewSong()
+        {
+        }
     }
 }

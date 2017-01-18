@@ -43,4 +43,6 @@ namespace AchordLira.Models.ViewModels
         public List<ViewSong> requestedSongs { get; set; }
         public string adminNotifications { get; set; }
     }
+    //---------------------------------------------------------------------------------------------//
+
 }

@@ -41,14 +41,18 @@ namespace AchordLira.Controllers
             //Geting user favorite songs
             pageModel.favoritSongs = dbNeo4j.UserGetFavoriteSongs(pageModel.user.name);
 
+            //Getting user admin notification count
             pageModel.adminNotifications = dbRedis.GetAdminNotificationsCount();
 
+            //Geting user admin request songs
             pageModel.requestedSongs = dbNeo4j.SongDraftRead();
 
+            ViewBag.showNav = true;
             return View(pageModel);
         }
         public ActionResult Register(string name, string email, string password, string confirm)
         {
+            ViewBag.showNav = false;
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 return Redirect("/");
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
@@ -94,6 +98,7 @@ namespace AchordLira.Controllers
         // GET: User/Login
         public ActionResult Login(string email,string password)
         {
+            ViewBag.showNav = false;
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 return Redirect("/");
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();

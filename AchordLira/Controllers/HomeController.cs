@@ -44,6 +44,7 @@ namespace AchordLira.Controllers
             //Getting songs requests
             pageModel.songRequests = dbNeo4j.SongRequestRead();
 
+            ViewBag.showNav = true;
             return View(pageModel);
         }
 
