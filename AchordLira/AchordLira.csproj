@@ -211,6 +211,7 @@
     <Compile Include="Models\Neo4J\Models\Comment.cs" />
     <Compile Include="Models\Neo4J\Models\Genre.cs" />
     <Compile Include="Models\Neo4J\Models\Song.cs" />
+    <Compile Include="Models\Neo4J\Models\SongDraft.cs" />
     <Compile Include="Models\Neo4J\Models\SongRequest.cs" />
     <Compile Include="Models\Neo4J\Models\User.cs" />
     <Compile Include="Models\Neo4J\Neo4jDataProvider.cs" />
@@ -266,6 +267,8 @@
     <Content Include="Views\User\Register.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Artist\Index.cshtml" />
+    <Content Include="Views\Song\Create.cshtml" />
+    <Content Include="Views\Song\Approve.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

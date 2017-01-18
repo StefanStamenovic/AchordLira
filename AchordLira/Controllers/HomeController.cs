@@ -44,6 +44,7 @@ namespace AchordLira.Controllers
             //Getting songs requests
             pageModel.songRequests = dbNeo4j.SongRequestRead();
 
+            ViewBag.showNav = true;
             return View(pageModel);
         }
 
@@ -55,7 +56,7 @@ namespace AchordLira.Controllers
                 songRequest.author = "Anonymous";
             songRequest.artist = artist;
             songRequest.song = song;
-            songRequest.date = DateTime.Now.ToString("mm:hh dd-MM-yyyy"); ;
+            songRequest.date = DateTime.Now.ToString("mm:hh dd-MM-yyyy");
             if (!artist.Equals("") || !song.Equals(""))
             {
                 Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();

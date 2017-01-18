@@ -1,4 +1,4 @@
-﻿
+﻿@using AchordLira.Models.ViewModels;
 @{
     ViewBag.Title = "User";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -11,33 +11,35 @@
             <li class=""><a href="#favorite" data-toggle="tab" aria-expanded="false">Favorites</a></li>
             @if (Model != null && Model.user != null && Model.user.admin)
             {
-                <li class=""><a href="#requests" data-toggle="tab" aria-expanded="false" style="background-color: #ff4136; color: white">Requests<span class="badge" style="margin-left: 10px;background-color: #0971B2; color: white">3</span></a></li>
+                <li class=""><a href="#requests" data-toggle="tab" aria-expanded="false" style="background-color: #ff4136; color: white">Requests<span class="badge" style="margin-left: 10px;background-color: #0971B2; color: white">@Model.adminNotifications</span></a></li>
             }
         </ul>
         <div id="myTabContent" class="tab-content">
             <div class="tab-pane fade active in" id="my">
-                <div class="clearfix" style="margin: 5px;">
-                    <div class="pull-right">
-                        <a href="#" class="btn btn-default">Create new</a>
-                    </div>
-                </div>
                 <div class="panel-body" style="padding: 0px;">
+                    <div class="clearfix" style="margin: 5px;">
+                        <div class="pull-right">
+                            <a href="/Song/Create/" class="btn btn-default">Create new</a>
+                        </div>
+                    </div>
                     <ul class="list-group">
-                        <li class="list-group-item clearfix">
-                            <a href="#" class="h4 link pull-left" style="text-decoration: none;">Izvodjac- Pesma</a>
-                            <div class="pull-right">
-                                <a href="#" class="btn btn-default">Delete</a>
-                                <a href="#" class="btn btn-default">Edit</a>
-                            </div>
-                        </li>
-                        <li class="list-group-item clearfix">
-                            <a href="#" class="h4 link pull-left" style="text-decoration: none;">Izvodjac- Pesma</a>
-                            <div class="pull-right">
-                                <span class="badge" style="margin-right: 10px; background-color: #ff4136; color: white">Unapproved</span>
-                                <a href="#" class="btn btn-default">Delete</a>
-                                <a href="#" class="btn btn-default">Edit</a>
-                            </div>
-                        </li>
+                        @foreach (ViewSong song in Model.userSongs)
+                        {
+                            <li class="list-group-item clearfix">
+                                @if (song.approved)
+                                {
+                                    <a href="@song.link" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
+                                }
+                                else
+                                {
+                                    <a class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
+                                    <div class="pull-right">
+                                        <p>Pending Approval</p>
+                                    </div>
+                                }
+                                
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -45,12 +47,15 @@
                 <div class="panel-body" style="padding: 0px;">
                     <div class="panel-body" style="padding: 0px;">
                         <ul class="list-group">
-                            <li class="list-group-item clearfix">
-                                <a href="#" class="h4 link pull-left" style="text-decoration: none;">Izvodjac- Pesma</a>
-                                <div class="pull-right">
-                                    <a href="#" class="btn btn-default">Delete</a>
-                                </div>
-                            </li>
+                            @foreach (ViewSong song in Model.favoritSongs)
+                            {
+                                <li class="list-group-item clearfix">
+                                    <a href="@song.link" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
+                                    <div class="pull-right">
+                                        <a href="/Song/Delete?artist=@song.artist&song=@song.name" class="btn btn-default">Delete</a>
+                                    </div>
+                                </li>
+                            }
                         </ul>
                     </div>
                 </div>
@@ -62,14 +67,17 @@
                     <div class="panel-body" style="padding: 0px;">
                         <div class="panel-body" style="padding: 0px;">
                             <ul class="list-group">
-                                <li class="list-group-item clearfix">
-                                    <a href="#" class="h4 link pull-left" style="text-decoration: none;">Izvodjac- Pesma</a>
-                                    <div class="pull-right">
-                                        <strong style="display: inline-block; padding-right: 10px">Autor</strong>
-                                        <a href="#" class="btn btn-default">View</a>
-                                        <a href="#" class="btn btn-default">Delete</a>
-                                    </div>
-                                </li>
+                                @foreach (ViewSong draft in Model.requestedSongs)
+                                {
+                                    <li class="list-group-item clearfix">
+                                        <a class="h4 link pull-left" style="text-decoration: none;">@draft.artist - @draft.name</a>
+                                        <div class="pull-right">
+                                            <strong style="display: inline-block; padding-right: 10px">@draft.creator</strong>
+                                            <a href="/Song/Approve/?user=@draft.creator&artist=@draft.artist&name=@draft.name" class="btn btn-default">View</a>
+                                            <a href="/Song/DeleteDraft/?user=@draft.creator&artist=@draft.artist&name=@draft.name" class="btn btn-default">Delete</a>
+                                        </div>
+                                    </li>
+                                }
                             </ul>
                         </div>
                     </div>
@@ -94,14 +102,7 @@
                         <li class="list-group-item clearfix">
                             <h4 class="pull-left">Genre</h4>
                             <div class="pull-right">
-                                <a href="#" class="btn btn-default">Add</a>
-                                <a href="#" class="btn btn-default">Delete</a>
-                            </div>
-                        </li>
-                        <li class="list-group-item clearfix">
-                            <h4 class="pull-left">Chord</h4>
-                            <div class="pull-right">
-                                <a href="#" class="btn btn-default">Add</a>
+                                <a href="#addGenreModal" data-toggle="modal" class="btn btn-default">Add</a>
                                 <a href="#" class="btn btn-default">Delete</a>
                             </div>
                         </li>
@@ -109,6 +110,7 @@
                 </div>
             </div>
         }
+
         <div class="panel panel-info">
             <div class="panel-heading">Info</div>
             <div class="panel-body">
@@ -120,32 +122,21 @@
                 }
             </div>
         </div>
-        <div class="modal" id="requestModal">
+       
+         <div class="modal" id="addGenreModal">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title">Create request</h4>
+                        <h4 class="modal-title">Create Genre</h4>
                     </div>
                     <div class="modal-body">
-                        <form class="form-horizontal">
+                        <form class="form-horizontal" action="CreateGenre/" method="get">
                             <fieldset>
                                 <div class="form-group">
-                                    <label class="col-lg-2 control-label">Author</label>
+                                    <label class="col-lg-2 control-label">Genre Name:</label>
                                     <div class="col-lg-10">
-                                        <input type="text" class="form-control" id="inputEmail" placeholder="Anonymous">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-lg-2 control-label">Artist</label>
-                                    <div class="col-lg-10">
-                                        <input type="text" class="form-control" id="inputEmail" placeholder="">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-lg-2 control-label">Song</label>
-                                    <div class="col-lg-10">
-                                        <input type="text" class="form-control" id="inputEmail" placeholder="">
+                                        <input type="text" class="form-control" id="name" name="name" placeholder="Example: Ska">
                                     </div>
                                 </div>
                                 <div class="form-group">
