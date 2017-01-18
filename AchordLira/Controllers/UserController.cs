@@ -13,7 +13,7 @@ namespace AchordLira.Controllers
 {
     public class UserController : Controller
     {
-        // GET: User
+        // GET /User/Index
         public ActionResult Index()
         {
             UserPageViewModel pageModel = new UserPageViewModel();
@@ -22,11 +22,8 @@ namespace AchordLira.Controllers
             else
                 return Redirect("/");
 
-            pageModel.user = (ViewUser)(Session["user"]);
-
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             RedisDataProvider dbRedis = new RedisDataProvider();
-        
 
             pageModel.genre = null;
 
@@ -54,25 +51,19 @@ namespace AchordLira.Controllers
             ViewBag.showNav = true;
             return View(pageModel);
         }
+
+        //GET /User/Register
         public ActionResult Register(string name, string email, string password, string confirm)
         {
-            ViewBag.showNav = false;
+            PageViewModel pageModel = new PageViewModel();
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 return Redirect("/");
+
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
-            dbNeo4j.UserExists(email, name);
 
-            PageViewModel pageModel = new PageViewModel();
-            pageModel.genre = null;
-
-            //Getting artists
-            pageModel.artists = dbNeo4j.ArtistRead(pageModel.genre);
-
-            //Getting genres
-            pageModel.genres = dbNeo4j.GenreRead();
+            ViewBag.showNav = false;
             if (name == null && email == null && password == null && confirm == null)
                 return View(pageModel);
-
             if (password != confirm)
                 ViewBag.error = "Passwords don't match.";
             if (dbNeo4j.UserExists(email, name))
@@ -96,6 +87,7 @@ namespace AchordLira.Controllers
 
             ViewUser vuser = new ViewUser(user);
             Session["user"] = vuser;
+
             return Redirect("/");
         }
 
@@ -105,18 +97,13 @@ namespace AchordLira.Controllers
             ViewBag.showNav = false;
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 return Redirect("/");
+
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+
             User user = dbNeo4j.UserRead(email, password);
             if (user==null)
             {
                 PageViewModel pageModel = new PageViewModel();
-                pageModel.genre = null;
-
-                //Getting artists
-                pageModel.artists = dbNeo4j.ArtistRead(pageModel.genre);
-
-                //Getting genres
-                pageModel.genres = dbNeo4j.GenreRead();
 
                 ViewBag.error = "Wrong email or password.";
                 if (email == null && password == null)
@@ -128,6 +115,7 @@ namespace AchordLira.Controllers
             return Redirect("/");
         }
 
+        //GET /User/Logout
         public ActionResult Logout()
         {
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
@@ -135,6 +123,7 @@ namespace AchordLira.Controllers
             return Redirect("/");
         }
 
+        //GET /User/Delete
         public ActionResult Delete(string name)
         {
             //Samo admin moze da obrise korisnika
@@ -150,6 +139,7 @@ namespace AchordLira.Controllers
 
         #region Artist and Genre
 
+        //GET /User/CreateGenre/
         public ActionResult CreateGenre(string name)
         {
 
@@ -157,20 +147,15 @@ namespace AchordLira.Controllers
             if (Session["user"] == null || ((ViewUser)Session["user"]).admin == false)
                 return Redirect("/");
 
-
             if (name == null || name == "")
-            {
                 return Redirect("/User/");
-            }
 
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
 
             List<string> check = dbNeo4j.GenreRead();
 
             if (check.Contains(name))
-            {
                 return Redirect("/User/#addGenreModal");
-            }
             else
             {
                 Genre genre = new Genre();
@@ -178,9 +163,9 @@ namespace AchordLira.Controllers
                 dbNeo4j.GenreCreate(genre);
                 return Redirect("/User/");
             }
-
         }
 
+        //GET /User/DeleteGenre/
         public ActionResult DeleteGenre(string name)
         {
 
@@ -189,9 +174,7 @@ namespace AchordLira.Controllers
                 return Redirect("/");
 
             if (name == null || name == "")
-            {
                 return Redirect("/User/");
-            }
 
             
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
@@ -199,17 +182,15 @@ namespace AchordLira.Controllers
             List<string> check = dbNeo4j.GenreRead();
 
             if (!check.Contains(name))
-            {
                 return Redirect("/User/#deleteGenreModal");
-            }
             else
             {
                 dbNeo4j.GenreDelete(name);
                 return Redirect("/User/");
             }
-
         }
 
+        //GET /User/CreateArtist/
         public ActionResult CreateArtist(string name, string bio, string website, string genres)
         {
             //Samo admin dodaje izvodjaca
@@ -217,18 +198,14 @@ namespace AchordLira.Controllers
                 return Redirect("/");
 
             if (name == null || name == "" || bio == null || bio == "" || website == null || website == "" || genres == null || genres == "")
-            {
                 return Redirect("/User/");
-            }
 
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
 
             List<string> checkArtists = dbNeo4j.ArtistRead();
 
             if (checkArtists.Contains(name))
-            {
                 return Redirect("/User/#addArtistModal");
-            }
             else
             {
                 string genresClean = Regex.Replace(genres, " *, *", ",");
@@ -254,22 +231,18 @@ namespace AchordLira.Controllers
                 dbNeo4j.ArtistCreate(artist, validGenres);
                 return Redirect("/User/");
             }
-
         }
 
+        //GET /User/DeleteArtist/
         public ActionResult DeleteArtist(string name)
         {
-
-
             //Samo admin brise zanr
             if (Session["user"] == null || ((ViewUser)Session["user"]).admin == false)
                 return Redirect("/");
 
 
             if (name == null || name == "")
-            {
                 return Redirect("/User/");
-            }
 
 
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
@@ -277,9 +250,7 @@ namespace AchordLira.Controllers
             List<string> check = dbNeo4j.ArtistRead();
 
             if (!check.Contains(name))
-            {
                 return Redirect("/User/#deleteArtistModal");
-            }
             else
             {
                 dbNeo4j.ArtistDelete(name);

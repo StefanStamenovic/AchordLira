@@ -13,26 +13,24 @@ namespace AchordLira.Controllers
 {
     public class HomeController : Controller
     {
+        //GET /Home/Index
         public ActionResult Index(string genre)
         {
             HomePageViewModel pageModel = new HomePageViewModel();
 
             //Is loged 
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
-            {
                 pageModel.user = (ViewUser)(Session["user"]);
-            }
+
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             RedisDataProvider dbRedis = new RedisDataProvider();
 
+            #region NavBarData
+
             if (genre == "All")
-            {
                 pageModel.genre = null;
-            }
             else
-            {
                 pageModel.genre = genre;
-            }
 
             //Getting artists
             pageModel.artists = dbNeo4j.ArtistRead(genre);
@@ -49,6 +47,8 @@ namespace AchordLira.Controllers
             pageModel.genres = dbNeo4j.GenreRead();
             pageModel.genres.Sort();
 
+            #endregion
+
             //Getting popular songs
             List<string> popularSongNames = dbRedis.GetMostPopularSongs(10);
             pageModel.popularSongs = dbNeo4j.SongRead(popularSongNames);
@@ -60,10 +60,13 @@ namespace AchordLira.Controllers
             //Getting songs requests
             pageModel.songRequests = dbNeo4j.SongRequestRead();
 
+            
             ViewBag.showNav = true;
+
             return View(pageModel);
         }
 
+        //GET /SongRequest/Create/
         public ActionResult Create(string genre,string author,string artist,string song)
         {
             SongRequest songRequest = new SongRequest();
@@ -85,6 +88,7 @@ namespace AchordLira.Controllers
             return Redirect(redirectUri);
         }
 
+        //GET /SongRequest/Delete/
         public ActionResult Delete(string artist, string song, string author, string genre)
         {
             //Samo admin moze da obrise request
