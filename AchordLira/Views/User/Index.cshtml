@@ -11,7 +11,7 @@
             <li class=""><a href="#favorite" data-toggle="tab" aria-expanded="false">Favorites</a></li>
             @if (Model != null && Model.user != null && Model.user.admin)
             {
-                <li class=""><a href="#requests" data-toggle="tab" aria-expanded="false" style="background-color: #ff4136; color: white">Submissions<span class="badge" id ="notificationsCount"style="margin-left: 10px;background-color: #0971B2; color: white">@Model.adminNotifications</span></a></li>
+                <li class=""><a href="#requests" id="requestsTab"data-toggle="tab" aria-expanded="false" style="background-color: #ff4136; color: white">Submissions<span class="badge" id ="notificationsCount"style="margin-left: 10px;background-color: #0971B2; color: white">@Model.adminNotifications</span></a></li>
                 <li class=""><a href="#users" data-toggle="tab" aria-expanded="false" style="background-color: #ff4136; color: white">Users</a></li>
             }
         </ul>
