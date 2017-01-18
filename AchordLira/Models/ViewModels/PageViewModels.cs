@@ -31,8 +31,9 @@ namespace AchordLira.Models.ViewModels
     {
         public string artist { get; set; }
         public ViewSong song { get; set; }
-        public List<ViewComment> messages { get; set; }
-        public List<ViewSong> songs { get; set; }
+        public bool favorite = false;
+        public List<ViewComment> comments { get; set; }
+        public List<ViewSong> artistSongs { get; set; }
     }
     //---------------------------------------------------------------------------------------------//
     //User page model

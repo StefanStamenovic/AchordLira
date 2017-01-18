@@ -37,6 +37,8 @@ namespace AchordLira.Controllers
 
             pageModel.artist = artist;
 
+            //TODO: Napravi da se prikazuju podatci o artistu
+
             return View(pageModel);
         }
     }

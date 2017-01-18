@@ -436,6 +436,24 @@ namespace AchordLira.Models.Neo4J
             }
             return songs;
         }
+
+        public ViewSong SongRead(String artist,String song)
+        {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("artist_name", artist);
+            dictionary.Add("song_name", song);
+            CypherQuery query = new CypherQuery("MATCH (song:Song)-[relation:PERFORMED_BY]->(artist:Artist) WHERE song.name = {song_name} AND artist.name = {artist_name} RETURN song",
+                   dictionary, CypherResultMode.Set);
+            List<Song> qresSongs = ((IRawGraphClient)client).ExecuteGetCypherResults<Song>(query).ToList();
+            Song rsong = null;
+            ViewSong result = null;
+            if (qresSongs.Count > 0)
+            {
+                rsong = qresSongs.First();
+                result = new ViewSong(rsong, null, artist);
+            }
+            return result;
+        }
         public List<ViewSong> SongRead(List<string> songs)
         {
             List<ViewSong> result=new List<ViewSong>();
@@ -513,14 +531,27 @@ namespace AchordLira.Models.Neo4J
             ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
+        public bool SongCheckIsFavorite(string song, string artist, string user)
+        {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("artist_name", artist);
+            dictionary.Add("song_name", song);
+            dictionary.Add("user_name", user);
+            CypherQuery query = new CypherQuery("MATCH (user:User)-[relation:FAVORITE]->(song:Song) WHERE song.name = {song_name} AND artist.name = {artist_name} and user.name = {user_name}  RETURN {song}",
+                   dictionary, CypherResultMode.Set);
+            Song qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Song>(query).ToList().FirstOrDefault();
+            if (qres == null)
+                return false;
+            return true;
+        }
+
         #endregion
 
         #region Comment
 
         public void CommentCreate(Comment comment,String user,String song)
         {
-            //TODO: Treba uzeti novi id i proveriti da li postoje user i song
-            int id = 0;
+            int id = GetCommentId();
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             dictionary.Add("id", id);
             dictionary.Add("content", comment.content);
@@ -560,9 +591,40 @@ namespace AchordLira.Models.Neo4J
 
         }
 
-        public void CommentRead()
+        public List<ViewComment> CommentRead(String artist, String song)
         {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("artist_name", artist);
+            dictionary.Add("song_name", song);
+            CypherQuery query = new CypherQuery("MATCH (comment:Comment)-[relation: COMMENT_TO]->(song: Song)-[relation1:PERFORMED_BY]->(artist:Artist) WHERE song.name = { song_name } AND artist.name = { artist_name} RETURN comment",
+                   dictionary, CypherResultMode.Set);
+            List<Comment> qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Comment>(query).ToList();
+            List<ViewComment> comments = new List<ViewComment>();
+            foreach (Comment comment in qres)
+            {
+                dictionary = new Dictionary<string, object>();
+                dictionary.Add("id", comment.id);
 
+                query = new CypherQuery("MATCH (user:User)-[relation:COMMENTED_BY]->(comment:Comment) WHERE comment.id = {id}  RETURN user",
+                   dictionary, CypherResultMode.Set);
+                User qresUser = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList().FirstOrDefault();
+                if (qresUser!=null)
+                {
+                    ViewComment temp = new ViewComment(comment, qresUser.name);
+                    comments.Add(temp);
+                }
+            }
+            return comments;
+        }
+
+        private int GetCommentId()
+        {
+            CypherQuery query = new CypherQuery("MATCH (comment:Comment) WHERE exists(comment.id) RETURN max(comment.id)",
+                   null, CypherResultMode.Set);
+            int maxID = ((IRawGraphClient)client).ExecuteGetCypherResults<int>(query).ToList().FirstOrDefault();
+            if (maxID < 1)
+                return 0;
+            return maxID;
         }
 
         #endregion
