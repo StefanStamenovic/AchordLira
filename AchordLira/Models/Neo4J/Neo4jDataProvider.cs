@@ -12,9 +12,9 @@ namespace AchordLira.Models.Neo4J
     public class Neo4jDataProvider
     {
         private GraphClient client;
-        private Uri db_adres = new Uri("http://localhost:7474/db/data");
-        private string user_name = "neo4j";
-        private string password = "Stefan@1994";
+        private Uri db_adres = new Uri("http://localhost:7474/browser/");
+        private string user_name = "ming";
+        private string password = "ming";
         public string erorr = null;
 
         public Neo4jDataProvider()

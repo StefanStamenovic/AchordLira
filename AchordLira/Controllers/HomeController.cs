@@ -7,6 +7,7 @@ using AchordLira.Models.ViewModels;
 using AchordLira.Models.Neo4J;
 using AchordLira.Models.Neo4J.Models;
 using AchordLira.Models.Redis;
+using AchordLira.Models;
 
 namespace AchordLira.Controllers
 {
