@@ -100,7 +100,8 @@ namespace AchordLira.Controllers
             {
                 if (pageModel.artists.ContainsKey(c.ToString()))
                 {
-                    pageModel.artists[c.ToString()].Sort();
+                    List<ViewArtist> tmp = pageModel.artists[c.ToString()];
+                    pageModel.artists[c.ToString()] = tmp.OrderBy(x => x.name).ToList();
                 }
             }
 
