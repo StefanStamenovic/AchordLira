@@ -11,7 +11,7 @@ namespace AchordLira.Controllers
 {
     public class SearchController : Controller
     {
-        // GET: Search
+        // GET: /Search/
         public ActionResult Index(string text, string genre)
         {
 
@@ -33,23 +33,34 @@ namespace AchordLira.Controllers
 
             List<string> redisResults = dbRedis.AutoComplete(pageModel.user != null ? pageModel.user.name : null, text, false);
 
-            if (genre == "All")
+            #region NavBarData
+
+            if (genre == "All" || genre == "")
                 pageModel.genre = null;
             else
                 pageModel.genre = genre;
 
             //Getting artists
             pageModel.artists = dbNeo4j.ArtistRead(genre);
+            for (char c = 'A'; c <= 'Z'; c++)
+            {
+                if (pageModel.artists.ContainsKey(c.ToString()))
+                {
+                    pageModel.artists[c.ToString()].Sort();
+                }
+            }
+
 
             //Getting genres
             pageModel.genres = dbNeo4j.GenreRead();
+            pageModel.genres.Sort();
+
+            #endregion
 
             //Getting artist songs
             pageModel.matched = dbNeo4j.SearchResults(redisResults);
 
             pageModel.text = text;
-
-            //TODO: Napravi da se prikazuju podatci o artistu
 
             return View(pageModel);
         }

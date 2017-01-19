@@ -27,7 +27,7 @@ namespace AchordLira.Controllers
 
             #region NavBarData
 
-            if (genre == "All")
+            if (genre == "All" || genre == "")
                 pageModel.genre = null;
             else
                 pageModel.genre = genre;

@@ -22,13 +22,22 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-7">
             <div class="well" style="padding-left: 40px;">
+                @if (Model.user != null && Model.favorite != null) 
+                {
+                    if (Model.favorite )
+                    {
+                        <a href="/Song/DeleteFavorite?artist=@Model.song.artist&name=@Model.song.name" data-toggle="modal" class="btn btn-info pull-right">Remove from favorites</a>
+                    }
+                    else
+                    {
+                        <a href="/Song/AddFavorite?artist=@Model.song.artist&name=@Model.song.name" data-toggle="modal" class="btn btn-info pull-right">Favorite</a>
+                    }
+                }
                 <h3 style="margin-bottom: 0px;">@Model.artist</h3>
                 <h1 class="text-muted" style="margin-top: 0px; margin-bottom: 40px;">@Model.song.name</h1>
-                <h4 style="font-family: monospace; white-space: pre;">
-                    <pre class="singer_song">@Model.song.content</pre>
-                </h4>
+                <h4 id="singer_song"style="font-family: monospace; white-space: pre;">@Model.song.content</h4>
             </div>
             <div class="col-md-8">
                 @if (Model.user!=null)

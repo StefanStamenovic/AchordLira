@@ -12,6 +12,7 @@ namespace AchordLira.Controllers
 {
     public class SongController : Controller
     {
+        //GET /Song/Index/
         public ActionResult Index(string artist, string song,string genre)
         {
             ViewBag.showNav = true;
@@ -23,16 +24,29 @@ namespace AchordLira.Controllers
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             RedisDataProvider dbRedis = new RedisDataProvider();
 
-            if (genre == "All")
+            #region NavBarData
+
+            if (genre == "All" || genre == "")
                 pageModel.genre = null;
             else
                 pageModel.genre = genre;
 
             //Getting artists
             pageModel.artists = dbNeo4j.ArtistRead(genre);
+            for (char c = 'A'; c <= 'Z'; c++)
+            {
+                if (pageModel.artists.ContainsKey(c.ToString()))
+                {
+                    pageModel.artists[c.ToString()].Sort();
+                }
+            }
+
 
             //Getting genres
             pageModel.genres = dbNeo4j.GenreRead();
+            pageModel.genres.Sort();
+
+            #endregion
 
             //Getting artist songs
             pageModel.artistSongs = dbNeo4j.SongReadArtistSongs(artist);
@@ -53,9 +67,9 @@ namespace AchordLira.Controllers
 
             return View(pageModel);
         }
-        
-        
-        public ActionResult Create(string artist, string song, string content)
+
+        //GET /Song/CreateDraft/
+        public ActionResult CreateDraft(string artist, string song, string content)
         {
             ViewBag.showNav = false;
             PageViewModel pageModel = new PageViewModel();
@@ -93,7 +107,7 @@ namespace AchordLira.Controllers
             return Redirect("/User/");
         }
 
-        //Prikazuje pesmu adminu i daje opciju izmeni i potvrde 
+        //GET /Song/Approve/
         public ActionResult Approve(string user,string artist,string name,string content,string approve)
         {
             ViewBag.showNav = false;
@@ -157,6 +171,7 @@ namespace AchordLira.Controllers
             return View(pageModel);
         }
 
+        //GET /Song/DeleteDraft/
         public ActionResult DeleteDraft(string user, string artist,string name)
         {
             //Samo admin brise draft
@@ -175,7 +190,27 @@ namespace AchordLira.Controllers
             return Redirect("/User/");
         }
 
-        public ActionResult Delete(string artist, string name)
+        //GET /Song/AddFavorite/
+        public ActionResult AddFavorite(string artist, string name)
+        {
+            ViewUser user;
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
+                user = ((ViewUser)Session["user"]);
+            else
+                return Redirect("/");
+
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+            RedisDataProvider dbRedis = new RedisDataProvider();
+
+            dbNeo4j.SongAddToFavorites(name, artist, user.name);
+            string uri = "";
+            if (Request.UrlReferrer != null)
+                uri = Request.UrlReferrer.ToString();
+            return Redirect(uri);
+        }
+
+        //GET /Song/DeleteFavorite/
+        public ActionResult DeleteFavorite(string artist, string name)
         {
             ViewUser user;
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
@@ -188,9 +223,13 @@ namespace AchordLira.Controllers
 
             dbNeo4j.SongRemoveFromFavorites(name, artist, user.name);
 
-            return Redirect("/User/");
+            string uri = "";
+            if (Request.UrlReferrer != null)
+                uri = Request.UrlReferrer.ToString();
+            return Redirect(uri);
         }
 
+        //GET /Song/CreateComment/
         public ActionResult CreateComment(string artist, string song,string title,string content)
         {
             ViewUser user;

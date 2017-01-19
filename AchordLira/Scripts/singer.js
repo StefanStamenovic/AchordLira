@@ -51,10 +51,7 @@ function Singer(song) {
 }
 
 (function () {
-    var songs = document.querySelectorAll("pre.singer_song");
-
-    for (var i = 0; i < songs.length; i++) {
-        var singer = new Singer(songs[i]);
-        singer.init();
-    }
+    var song = document.querySelector("#singer_song");
+    var singer = new Singer(song);
+    singer.init();
 })();

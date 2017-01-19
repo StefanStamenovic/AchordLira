@@ -5,21 +5,21 @@
 }
 
 <div class="row">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
+    <div class="col-md-1"></div>
+    <div class="col-md-7">
         @if (Model != null && Model.artist != null ) 
         {
-            <h2>@Model.artist:</h2>
+            <h2>@Model.artist.name:</h2>
             if (Model != null && Model.artistSongs != null && Model.artistSongs.Count > 0)
             {
-                foreach (ViewSong song in Model.artistSongs)
+                <ul class="list-group">
+                @foreach (ViewSong song in Model.artistSongs)
                 {
-                    <ul class="list-group">
-                        <li class="list-group-item clearfix">
-                            <a href="@song.link" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
-                        </li>
-                    </ul>
+                    <li class="list-group-item clearfix">
+                        <a href="/Song/?artist=@song.artist&song=@song.name" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
+                    </li>
                 }
+                </ul>
             }
             else
             {
@@ -32,5 +32,18 @@
             <h2 class="text-center">There is no artist.</h2>
         }
     </div>
+    @if (Model != null && Model.artist != null)
+    {
+        <div class="col-md-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">Artis Info</div>
+                <div class="panel-body">
+                    <h4>Name: </h4><p>@Model.artist.name</p>
+                    <h4>Biography: </h4><p>@Model.artist.biography</p>
+                    <h4>Web site: </h4><a href="http://@Model.artist.website" style="text-decoration: none;">@Model.artist.website</a>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
