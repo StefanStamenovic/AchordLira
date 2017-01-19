@@ -1,0 +1,50 @@
+﻿@using AchordLira.Models.ViewModels;
+@{
+    ViewBag.Title = "Info";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-7">
+        @if (Model != null && Model.profile != null)
+        {
+            <h2>User songs:</h2>
+            if (Model != null && Model.userSongs != null && Model.userSongs.Count > 0)
+            {
+                <ul class="list-group">
+                    @foreach (ViewSong song in Model.userSongs)
+                    {
+                        <li class="list-group-item clearfix">
+                            <a href="/Song/?artist=@song.artist&song=@song.name" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <hr />
+                <h4>There are no songs created by this user.</h4>
+            }
+        }
+        else
+        {
+            <h2 class="text-center">There is no user.</h2>
+        }
+    </div>
+    @if (Model != null && Model.profile != null)
+    {
+        <div class="col-md-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">Info</div>
+                <div class="panel-body">
+                    <h4>Username: </h4><p>@Model.profile.name</p>
+                    <h4>Email: </h4><p>@Model.profile.email</p>
+                    <h4>Created: </h4><p>@Model.profile.date</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+

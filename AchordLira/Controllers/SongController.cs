@@ -94,7 +94,7 @@ namespace AchordLira.Controllers
             draft.name = song;
             draft.artist = artist;
             draft.link = "/" + artist + "/" + song;
-            draft.date = DateTime.Now.ToString("mm:hh dd-MM-yyyy");
+            draft.date = DateTime.Now.ToString("dd-MM-yyyy");
             draft.content = content;
 
             dbNeo4j.SongDraftCreate(draft, pageModel.user.name);
@@ -135,7 +135,7 @@ namespace AchordLira.Controllers
                 draft.content = content;
                 draft.artist = artist;
                 draft.approved = false;
-                draft.date= DateTime.Now.ToString("mm:hh dd-MM-yyyy");
+                draft.date= DateTime.Now.ToString("dd-MM-yyyy");
 
                 ViewBag.draft = draft;
                 if (artist == null && name == null && content == null)
@@ -152,7 +152,7 @@ namespace AchordLira.Controllers
                 Song song = new Song();
                 song.name = name;
                 song.content = content;
-                song.date= DateTime.Now.ToString("mm:hh dd-MM-yyyy");
+                song.date= DateTime.Now.ToString("dd-MM-yyyy");
                 song.link = "/" + artist + "/" + user + "/";
 
                 dbNeo4j.SongCreate(song, user, artist);
@@ -229,22 +229,29 @@ namespace AchordLira.Controllers
         //GET /Song/CreateComment/
         public ActionResult CreateComment(string artist, string song,string title,string content)
         {
+            string uri = "";
+            if (Request.UrlReferrer != null)
+                uri = Request.UrlReferrer.ToString();
+
             ViewUser user;
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 user = ((ViewUser)Session["user"]);
             else
                 return Redirect("/");
 
+            if(content==null || content=="")
+                return Redirect(uri);
+
             Comment comment = new Comment();
             comment.title = title;
             comment.content = content;
-            comment.date=DateTime.Now.ToString("mm:hh dd-MM-yyyy");
+            comment.date=DateTime.Now.ToString("dd-MM-yyyy");
 
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
 
             dbNeo4j.CommentCreate(comment, user.name, artist, song);
 
-            return Redirect("/Song/?artist=" + artist + "&song=" + song);
+            return Redirect(uri);
         }
     }
 }

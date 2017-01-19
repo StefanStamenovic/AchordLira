@@ -61,4 +61,11 @@ namespace AchordLira.Models.ViewModels
         public String text { get; set; }
         public List<ViewSong> matched { get; set; }
     }
+    //---------------------------------------------------------------------------------------------//
+    //User info model
+    public class UserInfoPageViewModel : PageViewModel
+    {
+        public List<ViewSong> userSongs { get; set; }
+        public ViewUser profile { get; set; }
+    }
 }

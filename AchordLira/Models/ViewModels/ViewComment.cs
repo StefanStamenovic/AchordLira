@@ -13,11 +13,11 @@ namespace AchordLira.Models.ViewModels
         public string author { get; set; }
         public string date { get; set; }
 
-        public ViewComment(Comment comment,String autor)
+        public ViewComment(Comment comment,String author)
         {
             title = comment.title;
             content = comment.content;
-            author = author;
+            this.author = author;
             date = comment.date;
         }
     }

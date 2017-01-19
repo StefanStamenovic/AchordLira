@@ -14,7 +14,7 @@ namespace AchordLira.Controllers
     public class UserController : Controller
     {
         // GET /User/Index
-        public ActionResult Index()
+        public ActionResult Index(String genre)
         {
             UserPageViewModel pageModel = new UserPageViewModel();
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
@@ -25,13 +25,29 @@ namespace AchordLira.Controllers
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             RedisDataProvider dbRedis = new RedisDataProvider();
 
-            pageModel.genre = null;
+            #region NavBarData
+
+            if (genre == "All" || genre == "")
+                pageModel.genre = null;
+            else
+                pageModel.genre = genre;
 
             //Getting artists
-            pageModel.artists = dbNeo4j.ArtistRead(pageModel.genre);
+            pageModel.artists = dbNeo4j.ArtistRead(genre);
+            for (char c = 'A'; c <= 'Z'; c++)
+            {
+                if (pageModel.artists.ContainsKey(c.ToString()))
+                {
+                    pageModel.artists[c.ToString()].Sort();
+                }
+            }
+
 
             //Getting genres
             pageModel.genres = dbNeo4j.GenreRead();
+            pageModel.genres.Sort();
+
+            #endregion
 
             //Geting user created songs
             pageModel.userSongs = dbNeo4j.GetUserSongsAndDrafts(pageModel.user.name);
@@ -47,6 +63,47 @@ namespace AchordLira.Controllers
 
             //User List
             pageModel.userList = dbNeo4j.UserRead();
+
+            ViewBag.showNav = true;
+            return View(pageModel);
+        }
+
+        // GET /User/Profile
+        public ActionResult Info(string user,string genre)
+        {
+            UserInfoPageViewModel pageModel = new UserInfoPageViewModel();
+
+            Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+
+            #region NavBarData
+
+            if (genre == "All" || genre == "")
+                pageModel.genre = null;
+            else
+                pageModel.genre = genre;
+
+            //Getting artists
+            pageModel.artists = dbNeo4j.ArtistRead(genre);
+            for (char c = 'A'; c <= 'Z'; c++)
+            {
+                if (pageModel.artists.ContainsKey(c.ToString()))
+                {
+                    pageModel.artists[c.ToString()].Sort();
+                }
+            }
+
+
+            //Getting genres
+            pageModel.genres = dbNeo4j.GenreRead();
+            pageModel.genres.Sort();
+
+            #endregion
+
+            //Geting user created songs
+            pageModel.userSongs = dbNeo4j.GetUserSongsAndDrafts(user);
+
+            //Geting user
+            pageModel.profile = dbNeo4j.UserRead(user);
 
             ViewBag.showNav = true;
             return View(pageModel);
@@ -81,7 +138,7 @@ namespace AchordLira.Controllers
             user.email = email;
             user.password = password;
             user.admin = false;
-            user.date = DateTime.Now.ToString("mm:hh dd-MM-yyyy");
+            user.date = DateTime.Now.ToString("dd-MM-yyyy");
 
             dbNeo4j.UserCreate(user);
 
