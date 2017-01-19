@@ -239,7 +239,9 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Initialization_Data\artistis.txt" />
+    <Content Include="Initialization_Data\favorites.txt" />
     <Content Include="Initialization_Data\genres.txt" />
+    <Content Include="Initialization_Data\requests.txt" />
     <Content Include="Initialization_Data\users.txt" />
     <Content Include="Scripts\auto-complete.js" />
     <Content Include="Scripts\bootstrap.js" />
