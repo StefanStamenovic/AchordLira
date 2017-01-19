@@ -80,6 +80,8 @@ namespace AchordLira.Models.Redis
             //U Hash se upise vrednost countera kao key
             //a neizmenjeni naziv pesme(bez lowercase) kao value
             string counter = redisClient.GetValue("counter");
+            if (counter == null)
+                redisClient.SetValue("counter", 1);
             redisClient.SetEntryInHash("hash.phrases", counter, phrase);
 
             //Ako ne postoji, kreira se sortirani skup za svaki parcijalni string
