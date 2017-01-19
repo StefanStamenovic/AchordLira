@@ -553,7 +553,7 @@ namespace AchordLira.Models.Neo4J
             dictionary.Add("artist_name", artist);
             dictionary.Add("song_name", name);
             dictionary.Add("user_name", user);
-            CypherQuery query = new CypherQuery("MATCH (song:Song)-[relation:PERFORMED_BY]->(artist:Artist) WHERE song.name = {song_name} AND artist.name = {artist_name}, (user:User) WHERE user.name = {user_name} CREATE (user)-[relation:FAVORITE]->(song)",
+            CypherQuery query = new CypherQuery("MATCH (song:Song)-[relation1:PERFORMED_BY]->(artist:Artist) WHERE song.name = {song_name} AND artist.name = {artist_name} WITH song MATCH (user:User) WHERE user.name = {user_name} CREATE (user)-[relation:FAVORITE]->(song)",
                    dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
         }
@@ -564,7 +564,7 @@ namespace AchordLira.Models.Neo4J
             dictionary.Add("artist_name", artist);
             dictionary.Add("song_name", name);
             dictionary.Add("user_name", user);
-            CypherQuery query = new CypherQuery("MATCH (user:User)-[relation:FAVORITE]->(song:Song) WHERE song.name = {song_name} AND artist.name = {artist_name} and user.name = {user_name}  DELETE relation",
+            CypherQuery query = new CypherQuery("MATCH (user:User)-[relation:FAVORITE]->(song:Song)-[relation1:PERFORMED_BY]->(artist:Artist) WHERE song.name = {song_name} AND artist.name = {artist_name} and user.name = {user_name}  DELETE relation",
                    dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
         }
@@ -575,7 +575,7 @@ namespace AchordLira.Models.Neo4J
             dictionary.Add("artist_name", artist);
             dictionary.Add("song_name", song);
             dictionary.Add("user_name", user);
-            CypherQuery query = new CypherQuery("MATCH (user:User)-[relation:FAVORITE]->(song:Song)-[relation1:PERFORMED_BY]->(artist:Artist) WHERE song.name = {song_name} AND artist.name = {artist_name} and user.name = {user_name}  RETURN {song}",
+            CypherQuery query = new CypherQuery("MATCH (user:User)-[relation:FAVORITE]->(song:Song)-[relation1:PERFORMED_BY]->(artist:Artist) WHERE song.name = {song_name} AND artist.name = {artist_name} and user.name = {user_name}  RETURN song",
                    dictionary, CypherResultMode.Set);
             Song qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Song>(query).ToList().FirstOrDefault();
             if (qres == null)
