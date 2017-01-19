@@ -46,7 +46,8 @@ namespace AchordLira.Controllers
             {
                 if (pageModel.artists.ContainsKey(c.ToString()))
                 {
-                    pageModel.artists[c.ToString()].Sort();
+                    List<ViewArtist> tmp = pageModel.artists[c.ToString()];
+                    pageModel.artists[c.ToString()] = tmp.OrderBy(x => x.name).ToList();
                 }
             }
 
@@ -59,6 +60,7 @@ namespace AchordLira.Controllers
 
             //Getting artist songs
             pageModel.matched = dbNeo4j.SearchResults(redisResults);
+            pageModel.matched = pageModel.matched.OrderBy(x => x.artist + " - " + x.name).ToList();
 
             pageModel.text = text;
 
