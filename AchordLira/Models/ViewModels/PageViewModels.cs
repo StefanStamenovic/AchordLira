@@ -46,6 +46,10 @@ namespace AchordLira.Models.ViewModels
 
         public List<ViewUser> userList { get; set; }
 
+        public string genreCount { get; set; }
+        public string artistCount { get; set; }
+        public string songCount { get; set; }
+
     }
     //---------------------------------------------------------------------------------------------//
     //Artist page model

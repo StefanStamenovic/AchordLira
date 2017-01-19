@@ -64,6 +64,17 @@ namespace AchordLira.Controllers
             //User List
             pageModel.userList = dbNeo4j.UserRead();
 
+            //Getting statistics
+            pageModel.songCount=dbRedis.GetSongCount();
+            if (pageModel.songCount == null || pageModel.songCount == "")
+                pageModel.songCount = "0";
+            pageModel.artistCount = dbRedis.GetArtistCount();
+            if (pageModel.artistCount == null || pageModel.artistCount == "")
+                pageModel.artistCount = "0";
+            pageModel.genreCount = dbRedis.GetGenreCount();
+            if (pageModel.genreCount == null || pageModel.genreCount == "")
+                pageModel.genreCount = "0";
+
             ViewBag.showNav = true;
             return View(pageModel);
         }

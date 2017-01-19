@@ -13,14 +13,14 @@
                     <a href="/Song/?artist=@song.artist&song=@song.name" class="list-group-item clearfix" style="padding-bottom: 0px;">
                         <div class="pull-left"><p class="text-info" style="margin-bottom: 0px;">@song.artist - @song.name</p></div>
                         <div class="pull-right" style="margin-bottom: 0px;">
-                            <h5>@song.date</h5>
+                            <h5>@song.creator</h5>
                         </div>
                     </a>
                 }
                 @if (Model==null || Model.popularSongs.Count < 1)
                 {
                     <hr />
-                    <h4>There is no popular songs.</h4>
+                    <h4 class="text-muted">There is no popular songs.</h4>
                 }
             </div>
         </div>
@@ -32,11 +32,11 @@
                 <div class="list-group">
                     @foreach (ViewSong song in Model.latestSongs)
                     {
-                        <a href="/Song/?artist=@song.artist&song=@song.name&genre=@Model.genre" class="list-group-item">@song.name <span class="pull-right">added @song.date</span></a>
+                        <a href="/Song/?artist=@song.artist&song=@song.name&genre=@Model.genre" class="list-group-item">@song.name <span class="pull-right text-muted">@song.date</span></a>
                     }
                     @if (Model == null || Model.latestSongs.Count < 1)
                     {
-                        <h4>There is no latest songs.</h4>
+                        <h4 class="text-muted">There is no latest songs.</h4>
                     }
                 </div>
             </div>
@@ -61,7 +61,7 @@
                 }
                 @if (Model == null || Model.songRequests.Count < 1)
                 {
-                    <h4>There is no requested songs.</h4>
+                    <h4 class="text-muted">There is no requested songs.</h4>
                 }
             </div>
         </div>

@@ -20,7 +20,7 @@
                 <div class="panel-body" style="padding: 0px;">
                     <div class="clearfix" style="margin: 5px;">
                         <div class="pull-right">
-                            <a href="/Song/Create/" class="btn btn-default">Create new</a>
+                            <a href="/Song/CreateDraft/" class="btn btn-default">Create new</a>
                         </div>
                     </div>
                     <ul class="list-group">
@@ -44,7 +44,7 @@
                         @if(Model.userSongs.Count<1)
                         {
                             <hr />
-                            <h4>There is no songs created by you.</h4>
+                            <h4 class="text-muted">There is no songs created by you.</h4>
                         }
                     </ul>
                 </div>
@@ -65,7 +65,7 @@
                             @if (Model.favoritSongs.Count < 1)
                             {
                                 <hr />
-                                <h4>You don't have favorite songs.</h4>
+                                <h4 class="text-muted">You don't have favorite songs.</h4>
                             }
                         </ul>
                     </div>
@@ -92,7 +92,7 @@
                                 @if (Model.requestedSongs.Count < 1)
                                 {
                                     <hr />
-                                    <h4>There is no user song submissions.</h4>
+                                    <h4 class="text-muted">There is no user song submissions.</h4>
                                 }
                             </ul>
                         </div>
@@ -111,6 +111,11 @@
                                             <a href="/User/Delete?name=@user.name" class="btn btn-default">Delete</a>
                                         </div>
                                     </li>
+                                }
+                                @if (Model.userList.Count < 1)
+                                {
+                                    <hr />
+                                    <h4 class="text-muted">There is no users.</h4>
                                 }
                             </ul>
                         </div>
@@ -144,21 +149,29 @@
                     </ul>
                 </div>
             </div>
-        }
-
-        <div class="panel panel-info">
-            <div class="panel-heading">Info</div>
-            <div class="panel-body">
-                @if (Model != null && Model.user != null)
-                {
-                    <h4>Username: </h4><p>@Model.user.name</p>
-                    <h4>Email: </h4><p>@Model.user.email</p>
-                    <h4>Created: </h4><p>@Model.user.date</p>
-                }
+            <div class="panel panel-danger">
+                <div class="panel-heading">Website statistics</div>
+                <div class="panel-body">
+                    <h4>Number of genres: </h4><p>@Model.genreCount</p>
+                    <h4>Number of artists: </h4><p>@Model.artistCount</p>
+                    <h4>Number of songs: </h4><p>@Model.songCount</p>
+                </div>
             </div>
-        </div>
-
-       
+        }
+        else
+        {
+            <div class="panel panel-info">
+                <div class="panel-heading">Info</div>
+                <div class="panel-body">
+                    @if (Model != null && Model.user != null)
+                    {
+                        <h4>Username: </h4><p>@Model.user.name</p>
+                        <h4>Email: </h4><p>@Model.user.email</p>
+                        <h4>Created: </h4><p>@Model.user.date</p>
+                    }
+                </div>
+            </div>
+        }
         <div class="modal" id="addGenreModal">
             <div class="modal-dialog">
                 <div class="modal-content">

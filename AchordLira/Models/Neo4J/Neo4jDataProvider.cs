@@ -715,6 +715,18 @@ namespace AchordLira.Models.Neo4J
             ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
+        public void SongRequestDelete(String artist, String song)
+        {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("artist", artist);
+            dictionary.Add("song", song);
+
+            CypherQuery query = new CypherQuery("MATCH (songrequest:SongRequest{artist: {artist}, song: {song}}) DELETE songrequest",
+                       dictionary, CypherResultMode.Set);
+
+            ((IRawGraphClient)client).ExecuteCypher(query);
+        }
+
         public void SongRequestUpdate()
         {
 

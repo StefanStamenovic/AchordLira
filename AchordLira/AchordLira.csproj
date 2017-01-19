@@ -282,7 +282,7 @@
     <Content Include="Views\User\Register.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Artist\Index.cshtml" />
-    <Content Include="Views\Song\Create.cshtml" />
+    <Content Include="Views\Song\CreateDraft.cshtml" />
     <Content Include="Views\Song\Approve.cshtml" />
     <Content Include="Views\User\Info.cshtml" />
   </ItemGroup>

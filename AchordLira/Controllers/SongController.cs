@@ -163,6 +163,7 @@ namespace AchordLira.Controllers
                 songDraft.name = name;
                 songDraft.artist = artist;
                 dbNeo4j.SongDraftDelete(songDraft, user);
+                dbNeo4j.SongRequestDelete(artist, name);
 
                 return Redirect("/User/");
             }
