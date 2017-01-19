@@ -17,6 +17,7 @@ namespace AchordLira.Models.Neo4J
         private string user_name = "neo4j";
         private string password = "Stefan@1994";
         public string erorr = null;
+        private RedisDataProvider redisClient = new RedisDataProvider();
 
         public Neo4jDataProvider()
         {
@@ -35,7 +36,6 @@ namespace AchordLira.Models.Neo4J
 
         public void UserCreate(User user)
         {
-            //TODO: Proveri da li postiji user
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             dictionary.Add("name", user.name);
             dictionary.Add("email", user.email);
@@ -169,6 +169,8 @@ namespace AchordLira.Models.Neo4J
                        dictionary, CypherResultMode.Set);
 
             ((IRawGraphClient)client).ExecuteCypher(query);
+
+            redisClient.AddGenreToRedis();
         }
 
         public void GenreDelete(String name)
@@ -180,6 +182,8 @@ namespace AchordLira.Models.Neo4J
                        dictionary, CypherResultMode.Set);
 
             ((IRawGraphClient)client).ExecuteCypher(query);
+
+            redisClient.RemoveGenreFromRedis();
         }
         
         public void GenreUpdate()
@@ -224,6 +228,8 @@ namespace AchordLira.Models.Neo4J
                            dictionary, CypherResultMode.Set);
                 ((IRawGraphClient)client).ExecuteCypher(query);
             }
+
+            redisClient.AddArtistToRedis();
         }
 
         public void ArtistDelete(String name)
@@ -234,6 +240,8 @@ namespace AchordLira.Models.Neo4J
             CypherQuery query = new CypherQuery("MATCH (artist:Artist) WHERE artist.name = {name} DETACH DELETE artist",
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
+
+            redisClient.RemoveArtistFromRedis();
         }
 
         public void ArtistUpdate()
@@ -419,6 +427,8 @@ namespace AchordLira.Models.Neo4J
             query = new CypherQuery("MATCH (song:Song{name: {song_name}}),(artist:Artist{name: {artist_name}}) CREATE (song)-[relation:PERFORMED_BY]->(artist)",
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
+
+            redisClient.AddSongToRedis(artist + " - " + song.name);
         }
 
         public void SongDelete(String artis, String name, String user)
@@ -431,6 +441,8 @@ namespace AchordLira.Models.Neo4J
             CypherQuery query = new CypherQuery("MATCH (user:User)-[relation:CREATED]->(song:Song)-[relation1:PERFORMED_BY]->(artist:Artist) WHERE song.name = {song_name} AND user.name = {user_name} AND artist.name = {artist_name} DETACH DELETE song",
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
+
+            redisClient.AddSongToRedis(artis + " - " + name);
         }
 
         public void SongUpdate()
@@ -483,39 +495,22 @@ namespace AchordLira.Models.Neo4J
         public List<ViewSong> SongRead(List<string> songs)
         {
             List<ViewSong> result=new List<ViewSong>();
-            //Dictionary<string, object> dictionary;
-            //foreach(string song in songs)
-            //{
-            //    dictionary = new Dictionary<string, object>();
-            //    dictionary.Add("name", song);
 
-            //    CypherQuery query = new CypherQuery("MATCH (song:Song { name: {name}) RETURN song",
-            //               dictionary, CypherResultMode.Set);
-            //    List<Song> qresSong= ((IRawGraphClient)client).ExecuteGetCypherResults<Song>(query).ToList();
+            foreach (string item in songs)
+            {
+                string song = item.Substring(item.IndexOf(" - ") + 3);
+                string artist = item.Substring(0, item.IndexOf(" - "));
 
-            //    query = new CypherQuery("MATCH (user:User)-[relation:CREATED]->(song:Song) WHERE song.name = {name} RETURN user",
-            //               dictionary, CypherResultMode.Set);
-            //    List<User> qresUser = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList();
-
-            //    Song resSong = null;
-            //    if (qresSong.Count > 0)
-            //        resSong = qresSong.First();
-            //    User resUser = null;
-            //    if (qresUser.Count > 0)
-            //        resUser = qresUser.First();
-
-            //    dictionary = new Dictionary<string, object>();
-            //    dictionary.Add("song_name", resSong.name);
-            //    query = new CypherQuery("MATCH (song:Song)-[relation:PERFORMED_BY]->(artist:Artist) WHERE song.name = {song_name} RETURN artist",
-            //           dictionary, CypherResultMode.Set);
-            //    List<Artist> qresArtist = ((IRawGraphClient)client).ExecuteGetCypherResults<Artist>(query).ToList();
-
-            //    Artist artist = null;
-            //    if (qresArtist.Count > 0)
-            //        artist = qresArtist.First();
-            //    ViewSong temp = new ViewSong(song, user, artist.name);
-            //    result.Add(temp);
-            //}
+                Dictionary<string, object> dictionary = new Dictionary<string, object>();
+                dictionary.Add("artist_name", artist);
+                dictionary.Add("song_name", song);
+                CypherQuery query = new CypherQuery("MATCH (song:Song)-[relation:PERFORMED_BY]->(artist:Artist) WHERE song.name = {song_name} AND artist.name = {artist_name} RETURN song",
+                       dictionary, CypherResultMode.Set);
+                Song qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Song>(query).ToList().FirstOrDefault();
+                if (qres != null)
+                    result.Add(new ViewSong(qres, null, artist));
+            }
+            
             return result;
         }
 
@@ -661,7 +656,6 @@ namespace AchordLira.Models.Neo4J
 
         public void SongRequestCreate(SongRequest songRequest)
         {
-            //TODO: Proveri da li postiji submission
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
             dictionary.Add("author", songRequest.author);
             dictionary.Add("artist", songRequest.artist);
@@ -722,11 +716,12 @@ namespace AchordLira.Models.Neo4J
 
             foreach (string word in text)
             {
-                string artist = word.Substring(word.IndexOf(" - ") + 3);
+                string song = word.Substring(word.IndexOf(" - ") + 3);
+                string artist = word.Substring(0, word.IndexOf(" - "));
 
                 Dictionary<string, object> dictionary = new Dictionary<string, object>();
-                dictionary.Add("artist", word.Substring(0, word.IndexOf(" - ")));
-                dictionary.Add("song", artist);
+                dictionary.Add("artist", artist);
+                dictionary.Add("song", song);
 
                 CypherQuery query = new CypherQuery("MATCH (song:Song)-[relation:PERFORMED_BY]->(artist:Artist) WHERE song.name={song} AND artist.name={artist} RETURN song",
                        dictionary, CypherResultMode.Set);

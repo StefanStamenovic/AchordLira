@@ -164,7 +164,7 @@ namespace AchordLira.Models.Redis
         }
 
         /** Osnovna metoda, za uneti string vraca sva poklapanja za autocomplete */
-        public List<string> AutoComplete(string userID, string text)
+        public List<string> AutoComplete(string userID, string text, bool autocomplete)
         {
             var redisClient = RedisDataLayer.GetClient();
 
@@ -179,7 +179,7 @@ namespace AchordLira.Models.Redis
             //Ako je u pitanju jedna rec, prosto vrati poklapanja
             else if (words.Length == 1)
             {
-                if (words[0].Length == 1 && userID != null)
+                if (words[0].Length == 1 && userID != null && autocomplete)
                     return redisClient.GetAllItemsFromList("user.search." + userID);
                 else
                     hashKeys = redisClient.GetRangeFromSortedSet("search." + words[0], 0, -1).ToArray();
@@ -222,14 +222,15 @@ namespace AchordLira.Models.Redis
 
         #endregion
 
+
         #region Data & Statictics
+
         public void IncrementSongVisitCount(string id)
         {
             var redisClient = RedisDataLayer.GetClient();
             redisClient.IncrementItemInSortedSet("songs.popular", id, 1);
         }
 
-        //TODO: dodaj artist.popular/latest i vracaj dictionary
         public List<string> GetMostPopularSongs(int number)
         {
             var redisClient = RedisDataLayer.GetClient();
@@ -242,13 +243,13 @@ namespace AchordLira.Models.Redis
             return redisClient.GetAllItemsFromList("songs.latest");
         }
 
-        public void AddSongToRedis(string id, string name)
+        public void AddSongToRedis(string name)
         {
             var redisClient = RedisDataLayer.GetClient();
-            redisClient.AddItemToSortedSet("songs.popular", id, 0);
+            redisClient.AddItemToSortedSet("songs.popular", name, 0);
             redisClient.IncrementValue("songs.count");
             redisClient.TrimList("songs.latest", 0, 4);
-            redisClient.PushItemToList("songs.latest", id);
+            redisClient.PushItemToList("songs.latest", name);
             InsertSearchPhrase(name, false);
         }
 
@@ -256,6 +257,31 @@ namespace AchordLira.Models.Redis
         {
             var redisClient = RedisDataLayer.GetClient();
             return redisClient.GetValue("songs.count");
+        }
+
+        public void RemoveSongFromRedis(string name)
+        {
+            var redisClient = RedisDataLayer.GetClient();
+            string listItemIn;
+            List<string> listItemsOut = new List<string>();
+
+            for (int i = 0; i < redisClient.GetListCount("songs.latest"); i++)
+            {
+                listItemIn = redisClient.PopItemFromList("songs.latest");
+                if (listItemIn != name)
+                    listItemsOut.Add(listItemIn);
+            }
+
+            listItemsOut.Reverse();
+
+            for (int i = 0; i < listItemsOut.Count; i++)
+            {
+                redisClient.PushItemToList("songs.latest", listItemsOut[i]);
+            }
+
+            redisClient.RemoveItemFromSortedSet("songs.popular", name);
+            redisClient.DecrementValue("songs.count");
+            DeleteSearchPhrase(name);
         }
 
         public void AddArtistToRedis()
@@ -270,6 +296,12 @@ namespace AchordLira.Models.Redis
             return redisClient.GetValue("artists.count");
         }
 
+        public void RemoveArtistFromRedis()
+        {
+            var redisClient = RedisDataLayer.GetClient();
+            redisClient.DecrementValue("artists.count");
+        }
+
         public void AddGenreToRedis()
         {
             var redisClient = RedisDataLayer.GetClient();
@@ -280,6 +312,12 @@ namespace AchordLira.Models.Redis
         {
             var redisClient = RedisDataLayer.GetClient();
             return redisClient.GetValue("genres.count");
+        }
+
+        public void RemoveGenreFromRedis()
+        {
+            var redisClient = RedisDataLayer.GetClient();
+            redisClient.DecrementValue("genres.count");
         }
 
         public void ClearAdminNotifications()
@@ -299,7 +337,6 @@ namespace AchordLira.Models.Redis
             var redisClient = RedisDataLayer.GetClient();
             return redisClient.GetValue("admin.notification.count");
         }
-
 
 
         #endregion

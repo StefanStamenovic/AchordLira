@@ -19,7 +19,9 @@ namespace AchordLira.Controllers
             //Is loged 
             if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
                 pageModel.user = (ViewUser)(Session["user"]);
+
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+            RedisDataProvider dbRedis = new RedisDataProvider();
 
             if (genre == "All")
                 pageModel.genre = null;
@@ -47,7 +49,8 @@ namespace AchordLira.Controllers
 
             pageModel.artist = artist;
 
-            //TODO: Dodaj redis posetu
+            dbRedis.IncrementSongVisitCount(artist + " - " + song);
+
             return View(pageModel);
         }
         
