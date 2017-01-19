@@ -51,7 +51,7 @@ namespace AchordLira.Models.ViewModels
     //Artist page model
     public class ArtistPageViewModel : PageViewModel
     {
-        public String artist { get; set; }
+        public ViewArtist artist { get; set; }
         public List<ViewSong> artistSongs { get; set; }
     }
 }

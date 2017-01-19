@@ -285,6 +285,18 @@ namespace AchordLira.Models.Neo4J
             return result;
         }
 
+        public ViewArtist ArtistReadOne(string name)
+        {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("name", name);
+            CypherQuery query = new CypherQuery("MATCH (artist:Artist) WHERE artist.name = {name} RETURN artist",
+                   dictionary, CypherResultMode.Set);
+            Artist qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Artist>(query).ToList().FirstOrDefault();
+            if (qres == null)
+                return null;
+            ViewArtist artist = new ViewArtist(qres);
+            return artist;
+        }
         #endregion
 
         #region SongDraft
