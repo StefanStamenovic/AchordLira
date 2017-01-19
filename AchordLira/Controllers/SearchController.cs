@@ -14,16 +14,24 @@ namespace AchordLira.Controllers
         // GET: /Search/
         public ActionResult Index(string text, string genre)
         {
-            ViewBag.showNav = true;
-            SearchPageViewModel pageModel = new SearchPageViewModel();
-            //Is loged 
-            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
-                pageModel.user = (ViewUser)(Session["user"]);
 
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             RedisDataProvider dbRedis = new RedisDataProvider();
 
-            List<string> redisResults = dbRedis.AutoComplete(pageModel.user != null ? pageModel.user.name : null, text);
+            ViewBag.showNav = true;
+            SearchPageViewModel pageModel = new SearchPageViewModel();
+
+
+            //Is loged 
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
+            {
+                pageModel.user = (ViewUser)(Session["user"]);
+                dbRedis.AddSearchPhraseFromUser(pageModel.user.name, text);
+            }
+
+            
+
+            List<string> redisResults = dbRedis.AutoComplete(pageModel.user != null ? pageModel.user.name : null, text, false);
 
             #region NavBarData
 

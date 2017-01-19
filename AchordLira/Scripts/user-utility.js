@@ -71,6 +71,16 @@
     if ($('#notificationsCount').html() == '0') {
         $('#notificationsCount').hide();
     }
+
+
+    if (window.location.hash == '#deleteFavorite') {
+        $('#artistNotExistError').show();
+    }
+
+    if (window.location.hash == '#deleteFavorite') {
+        $('#artistNotExistError').show();
+    }
+
 };
 
 

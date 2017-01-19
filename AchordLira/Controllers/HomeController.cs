@@ -110,7 +110,7 @@ namespace AchordLira.Controllers
             string user = null;
             if (Session["user"] != null)
                 user = ((ViewUser)Session["user"]).name;
-            List<string> results = dp.AutoComplete(user, text);
+            List<string> results = dp.AutoComplete(user, text, true);
             JsonResult inter = Json(results);
             return inter;
         }
