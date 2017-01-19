@@ -1,17 +1,33 @@
-﻿
+﻿@using AchordLira.Models.ViewModels;
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
 <div class="row">
     <div class="col-md-2"></div>
     <div class="col-md-8">
-        <h2>Search:</h2>
-        <ul class="list-group">
-            <li class="list-group-item clearfix">
-                <a href="#" class="h4 link pull-left" style="text-decoration: none;">Izvodjac- Pesma</a>
-            </li>
-        </ul>
+        @if (Model != null && Model.matched != null && Model.text != null)
+        {
+            <h2>Searched for: "@Model.text"</h2>
+            if (Model != null && Model.matched.Count > 0)
+            {
+                <h4>@Model.matched.Count songs found:</h4>
+                foreach (ViewSong song in Model.matched)
+                {
+                    <ul class="list-group">
+                        <li class="list-group-item clearfix">
+                            <a href="@song.link" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
+                        </li>
+                    </ul>
+                }
+            }
+            else
+            {
+                <hr />
+                <h2>No results.</h2>
+            }
+        }
     </div>
 </div>

@@ -1,0 +1,84 @@
+/* *************************************************
+//       SingerJS | Simple chord highlighter.     //
+//       Copyright © 2015 Sergei Kriger           //
+// ************************************************/
+
+/*.singer_song {
+    font-family: Consolas, Monaco, monospace;
+    display: block;
+    overflow: auto;
+    background-color: #fff;
+    width: 100%;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #e5e5e5;
+}
+
+.singer_song_title {
+    font-weight: bold;
+}
+
+.singer_song_author {
+    font-style: italic;
+}*/
+
+.singer_song_chords {
+    color: #f27272;
+}
+
+/*@media only screen and (max-width: 320px) {
+    .singer_song {
+        font-size: 16px;
+        line-height: 1.5;
+        padding: 15px;
+    }
+
+    .singer_song_title {
+        font-size: 22px;
+    }
+}
+
+@media only screen and (min-width: 321px) and (max-width: 480px) {
+    .singer_song {
+        font-size: 16px;
+        line-height: 1.5;
+        padding: 15px;
+    }
+
+    .singer_song_title {
+        font-size: 22px;
+    }
+}
+
+@media only screen and (min-width: 481px) and (max-width: 768px) {
+    .singer_song {
+        font-size: 20px;
+        line-height: 1.5;
+    }
+
+    .singer_song_title {
+        font-size: 27px;
+    }
+}
+
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+    .singer_song {
+        font-size: 20px;
+        line-height: 1.5;
+    }
+
+    .singer_song_title {
+        font-size: 27px;
+    }
+}
+
+@media only screen and (min-width: 1025px) {
+    .singer_song {
+        font-size: 22px;
+        line-height: 1.5;
+    }
+
+    .singer_song_title {
+        font-size: 30px;
+    }
+}*/

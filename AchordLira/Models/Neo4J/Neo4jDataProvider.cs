@@ -6,6 +6,7 @@ using Neo4jClient;
 using AchordLira.Models.Neo4J.Models;
 using Neo4jClient.Cypher;
 using AchordLira.Models.ViewModels;
+using AchordLira.Models.Redis;
 
 namespace AchordLira.Models.Neo4J
 {
@@ -723,6 +724,46 @@ namespace AchordLira.Models.Neo4J
             List<ViewSong> allSongs = SongRead(user);
             allSongs.AddRange(SongDraftRead(user));
             return allSongs;
+        }
+
+
+
+        public List<ViewSong> SearchResults(List<string> text)
+        {
+            List<ViewSong> matchedSongs = new List<ViewSong>();
+
+            foreach (string word in text)
+            {
+                string artist = word.Substring(word.IndexOf(" - ") + 3);
+
+                Dictionary<string, object> dictionary = new Dictionary<string, object>();
+                dictionary.Add("artist", word.Substring(0, word.IndexOf(" - ")));
+                dictionary.Add("song", artist);
+
+                CypherQuery query = new CypherQuery("MATCH (song:Song)-[relation:PERFORMED_BY]->(artist:Artist) WHERE song.name={song} AND artist.name={artist} RETURN song",
+                       dictionary, CypherResultMode.Set);
+                Song qres = ((IRawGraphClient)client).ExecuteGetCypherResults<Song>(query).ToList().FirstOrDefault();
+
+                if (qres != null)
+                {
+                    query = new CypherQuery("MATCH (user:User)-[relation:CREATED]->(song:Song)-[relation2:PERFORMED_BY]->(artist:Artist) WHERE song.name={song} AND artist.name={artist} RETURN user",
+                            dictionary, CypherResultMode.Set);
+                    User user = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList().FirstOrDefault();
+
+                    ViewSong tmp = new ViewSong();
+                    tmp.name = qres.name;
+                    tmp.artist = artist;
+                    tmp.date = qres.date;
+                    tmp.content = qres.content;
+                    tmp.link = qres.link;
+                    tmp.creator = user.name;
+                    tmp.approved = true;
+
+                    matchedSongs.Add(tmp);
+                }
+            }
+
+            return matchedSongs;
         }
 
         #endregion

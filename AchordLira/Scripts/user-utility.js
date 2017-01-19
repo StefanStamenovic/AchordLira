@@ -49,8 +49,12 @@
         $('#artistNotExistError').show();
     }
 
+    if ($('#notificationsCount').html() == '0')
+    {
+        $('#notificationsCount').hide();
+    }
 
-    $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function () {
+    $(document).on('shown.bs.tab', '#requestsTab', function () {
         $.ajax({
             type: "POST",
             url: '/User/RefreshSubmissions',
