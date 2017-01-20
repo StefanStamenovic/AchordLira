@@ -100,7 +100,8 @@ namespace AchordLira.Controllers
             {
                 if (pageModel.artists.ContainsKey(c.ToString()))
                 {
-                    pageModel.artists[c.ToString()].Sort();
+                    List<ViewArtist> tmp = pageModel.artists[c.ToString()];
+                    pageModel.artists[c.ToString()] = tmp.OrderBy(x => x.name).ToList();
                 }
             }
 
@@ -181,7 +182,7 @@ namespace AchordLira.Controllers
             }
             ViewUser vuser = new ViewUser(user);
             Session["user"] = vuser;
-            return Redirect("/");
+            return Redirect("/User");
         }
 
         //GET /User/Logout

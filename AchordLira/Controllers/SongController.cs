@@ -124,15 +124,6 @@ namespace AchordLira.Controllers
 
             if (approve != null)
             {
-                //Provera da li postoji Artist
-                List<string> allArtists = dbNeo4j.ArtistRead();
-                if (!allArtists.Contains(artist))
-                {
-                    ViewBag.noArtist = true;
-                    ViewBag.draft = dbNeo4j.SongDraftRead(user, artist, name);
-                    return View(pageModel);
-                }
-
                 //Promenjeni podatci
                 ViewSong draft = new ViewSong();
                 draft.creator = user;
@@ -152,6 +143,15 @@ namespace AchordLira.Controllers
 
                 if (ViewBag.error != null)
                     return View(pageModel);
+
+                //Provera da li postoji Artist
+                List<string> allArtists = dbNeo4j.ArtistRead();
+                if (!allArtists.Contains(artist))
+                {
+                    ViewBag.noArtist = true;
+                    return View(pageModel);
+                }
+
 
                 //Kriranje nove pesme
                 Song song = new Song();

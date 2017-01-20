@@ -14,14 +14,14 @@
             if (Model != null && Model.matched.Count > 0)
             {
                 <h4>@Model.matched.Count songs found:</h4>
-                foreach (ViewSong song in Model.matched)
+                <ul class="list-group">
+                @foreach (ViewSong song in Model.matched)
                 {
-                    <ul class="list-group">
                         <li class="list-group-item clearfix">
-                            <a href="@song.link" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
+                            <a href="/Song/?artist=@song.artist&song=@song.name" class="h4 link pull-left" style="text-decoration: none;">@song.artist - @song.name</a>
                         </li>
-                    </ul>
                 }
+                </ul>
             }
             else
             {
