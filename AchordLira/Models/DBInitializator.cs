@@ -30,20 +30,18 @@ namespace AchordLira.Models
 
         public void Initialize()
         {
-
-            DeleteAllData();
-
             string date = DateTime.Now.ToString("dd-MM-yyyy");
             
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             RedisDataProvider dbRedis = new RedisDataProvider();
 
-            dbRedis.ResetHashCounter();
-
             StreamReader stream;
             //Check is database initialized
             if (dbNeo4j.UserExists("admin", "admin"))
                 return;
+
+            DeleteAllData();
+            dbRedis.ResetHashCounter();
 
             #region Create users
 
