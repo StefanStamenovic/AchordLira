@@ -16,6 +16,14 @@ namespace AchordLira.Controllers
         //GET /Home/Index
         public ActionResult Index(string genre)
         {
+            #region Inicijalizacija baza podataka
+
+            DBInitializator initializator = new DBInitializator();
+            initializator.Initialize();
+
+            #endregion
+
+
             HomePageViewModel pageModel = new HomePageViewModel();
 
             //Is loged 

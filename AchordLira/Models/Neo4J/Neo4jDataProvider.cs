@@ -754,8 +754,6 @@ namespace AchordLira.Models.Neo4J
             return allSongs;
         }
 
-
-
         public List<ViewSong> SearchResults(List<string> text)
         {
             List<ViewSong> matchedSongs = new List<ViewSong>();
@@ -793,6 +791,13 @@ namespace AchordLira.Models.Neo4J
             }
 
             return matchedSongs;
+        }
+
+        public void DeleteBase()
+        {
+            CypherQuery query = new CypherQuery("MATCH (node) DETACH DELETE node",
+                       null, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
         #endregion

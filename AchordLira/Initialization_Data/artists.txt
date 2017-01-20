@@ -8,7 +8,7 @@ Ex-yu rock band.
 en.wikipedia.org/wiki/Azra
 Rock,Blues
 
-Arctic Monkeys
+Arctis Monkeys
 Popular rock band from UK.
 www.arcticmonkeys.com
 Rock
@@ -53,7 +53,7 @@ Idoli are Yugoslav new wave band from Belgrade.
 en.wikipedia.org/wiki/Idoli
 Rock,Blues,Pop
 
-Jimi Hendrix 
+Jimi Hendrix
 Jimi Hendrix was an American rock guitarist.
 jimihendrix.com
 Rock,Country,Blues
@@ -118,7 +118,7 @@ U2 are an Irish rock band from Dublin formed in 1976.
 www.u2.com
 Rock,Blues,Folk
 
-Van Halen  
+Van Halen
 Van Halen is an American hard rock band formed in Pasadena.
 www.van-halen.com
 Metal,Rock
