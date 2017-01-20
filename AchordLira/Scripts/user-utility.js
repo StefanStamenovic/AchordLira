@@ -1,5 +1,4 @@
-﻿window.onload = function () {
-
+﻿function user_utility() {
 
     $('#addGenreModal').on('hidden.bs.modal', function () {
         $('#genreExistsError').hide();
@@ -80,7 +79,6 @@
     if (window.location.hash == '#deleteFavorite') {
         $('#artistNotExistError').show();
     }
-
-};
-
+}
+  
 

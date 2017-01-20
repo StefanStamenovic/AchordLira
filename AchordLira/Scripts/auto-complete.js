@@ -1,11 +1,4 @@
-﻿/*
-    JavaScript autoComplete v1.0.4
-    Copyright (c) 2014 Simon Steinberger / Pixabay
-    GitHub: https://github.com/Pixabay/JavaScript-autoComplete
-    License: http://www.opensource.org/licenses/mit-license.php
-*/
-
-var autoComplete = (function () {
+﻿var autoComplete = (function () {
     // "use strict";
     function autoComplete(options) {
         if (!document.querySelector) return;
@@ -232,7 +225,7 @@ window.onload = function () {
         source: function (term, suggest) {
             $.ajax({
                 type: "POST",
-                url: '@Url.Action("Search", "Home")',
+                url: '/Home/Search',
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 async: true,
@@ -245,5 +238,6 @@ window.onload = function () {
             });
         }
     });
+    user_utility();
 };
 

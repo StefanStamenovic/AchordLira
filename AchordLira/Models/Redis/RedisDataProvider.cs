@@ -290,6 +290,9 @@ namespace AchordLira.Models.Redis
         {
             var redisClient = RedisDataLayer.GetClient();
             redisClient.DecrementValue("admin.notification.count");
+            if(int.Parse(redisClient.GetValue("admin.notification.count")) < 0)
+                redisClient.SetValue("admin.notification.count", "0");
+
         }
 
         public string GetAdminNotificationsCount()
