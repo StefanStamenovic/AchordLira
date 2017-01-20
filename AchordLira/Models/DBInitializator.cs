@@ -21,6 +21,7 @@ namespace AchordLira.Models
         string favoritesFilePath = @"~/Initialization_Data/favorites.txt";
         string commentsFilePath = @"~/Initialization_Data/comments.txt";
         string songRequestFilePath = @"~/Initialization_Data/requests.txt";
+        string songDraftFolderPath = @"~/Initialization_Data/SongDrafts/";
 
         //Uncomment in HomeController to initialize
         public DBInitializator()
@@ -136,6 +137,7 @@ namespace AchordLira.Models
                     song.name = stream.ReadLine();
                     string artist= stream.ReadLine();
                     string user = stream.ReadLine();
+                    stream.ReadLine();
                     song.content = stream.ReadToEnd();
                     song.date = date;
                     dbNeo4j.SongCreate(song,user,artist);
@@ -217,6 +219,31 @@ namespace AchordLira.Models
             catch (Exception e)
             {
 
+            }
+
+            #endregion
+
+            #region Create songs
+
+            string[] songDraftPaths = Directory.GetFiles(HostingEnvironment.MapPath(songDraftFolderPath));
+            foreach (string songDraftPath in songDraftPaths)
+            {
+                try
+                {
+                    stream = new StreamReader(songDraftPath);
+                    SongDraft songDraft = new SongDraft();
+                    songDraft.name = stream.ReadLine();
+                    songDraft.artist = stream.ReadLine();
+                    string user= stream.ReadLine();
+                    songDraft.content = stream.ReadToEnd();
+                    songDraft.date = date;
+                    dbNeo4j.SongDraftCreate(songDraft, user);
+                    stream.Close();
+                }
+                catch (Exception e)
+                {
+
+                }
             }
 
             #endregion

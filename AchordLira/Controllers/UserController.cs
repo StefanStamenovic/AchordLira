@@ -182,7 +182,7 @@ namespace AchordLira.Controllers
             }
             ViewUser vuser = new ViewUser(user);
             Session["user"] = vuser;
-            return Redirect("/");
+            return Redirect("/User");
         }
 
         //GET /User/Logout

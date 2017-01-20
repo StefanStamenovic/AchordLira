@@ -239,6 +239,16 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Initialization_Data\comments.txt" />
+    <Content Include="Initialization_Data\SongDrafts\Kerber - Bolje da sam druge ljubio.txt" />
+    <Content Include="Initialization_Data\SongDrafts\Kerber - Ratne igre.txt" />
+    <Content Include="Initialization_Data\SongDrafts\Riblja Corba - Kad sam bio mlad.txt" />
+    <Content Include="Initialization_Data\SongDrafts\S.A.R.S. - Glupost.txt" />
+    <Content Include="Initialization_Data\SongDrafts\S.A.R.S. - Lutka.txt" />
+    <Content Include="Initialization_Data\SongDrafts\S.A.R.S. - Perspektiva.txt" />
+    <Content Include="Initialization_Data\SongDrafts\Smak - Daire.txt" />
+    <Content Include="Initialization_Data\SongDrafts\Smak - Ljudi nije fer.txt" />
+    <Content Include="Initialization_Data\SongDrafts\Van Gogh - Neko te ima nocas.txt" />
+    <Content Include="Initialization_Data\SongDrafts\Zdravko Colic - Moja draga.txt" />
     <Content Include="Initialization_Data\Song\Aca Lukas - Bele ruze.txt" />
     <Content Include="Initialization_Data\Song\Arctis Monkeys - Do I Wanna Know.txt" />
     <Content Include="Initialization_Data\artists.txt" />
@@ -323,7 +333,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Initialization_Data\SongDrafts\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
