@@ -17,7 +17,7 @@ namespace AchordLira.Models.Neo4J
         private string user_name = "neo4j";
         private string password = "Stefan@1994";
         public string erorr = null;
-        private RedisDataProvider redisClient = new RedisDataProvider();
+        private RedisDataProvider dbRedis = new RedisDataProvider();
 
         public Neo4jDataProvider()
         {
@@ -58,7 +58,21 @@ namespace AchordLira.Models.Neo4J
             CypherQuery query = new CypherQuery("MATCH (user:User)-[relation:CREATED]->(song:Song) WHERE user.name = {name} WITH song MATCH (admin:User) WHERE admin.name = {admin_name} CREATE (admin)-[relation:CREATED]->(song) ",
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
-            query = new CypherQuery("MATCH (user:User)-[relation:CREATED]->(song:Song) WHERE user.name = {name} DETACH DELETE user ",
+
+            query = new CypherQuery("MATCH (user:User)-[relation:REQUESTED]->(draft:SongDraft) WHERE user.name = {name} RETURN draft",
+                       dictionary, CypherResultMode.Set);
+            int count = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList().Count;
+
+            for (int i = 0; i < count; i++)
+            {
+                dbRedis.RemoveAdminNotification();
+            }
+
+            query = new CypherQuery("MATCH (user:User)-[relation:REQUESTED]->(draft:SongDraft) WHERE user.name = {name} DETACH DELETE draft",
+                       dictionary, CypherResultMode.Set);
+            ((IRawGraphClient)client).ExecuteCypher(query);
+
+            query = new CypherQuery("MATCH (user:User) WHERE user.name = {name} DETACH DELETE user ",
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
         }
@@ -169,7 +183,7 @@ namespace AchordLira.Models.Neo4J
 
             ((IRawGraphClient)client).ExecuteCypher(query);
 
-            redisClient.AddGenreToRedis();
+            dbRedis.AddGenreToRedis();
         }
 
         public void GenreDelete(String name)
@@ -182,7 +196,7 @@ namespace AchordLira.Models.Neo4J
 
             ((IRawGraphClient)client).ExecuteCypher(query);
 
-            redisClient.RemoveGenreFromRedis();
+            dbRedis.RemoveGenreFromRedis();
         }
         
         public void GenreUpdate()
@@ -228,7 +242,7 @@ namespace AchordLira.Models.Neo4J
                 ((IRawGraphClient)client).ExecuteCypher(query);
             }
 
-            redisClient.AddArtistToRedis();
+            dbRedis.AddArtistToRedis();
         }
 
         public void ArtistDelete(String name)
@@ -240,7 +254,7 @@ namespace AchordLira.Models.Neo4J
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
 
-            redisClient.RemoveArtistFromRedis();
+            dbRedis.RemoveArtistFromRedis();
         }
 
         public void ArtistUpdate()
@@ -439,7 +453,7 @@ namespace AchordLira.Models.Neo4J
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
 
-            redisClient.AddSongToRedis(artist + " - " + song.name);
+            dbRedis.AddSongToRedis(artist + " - " + song.name);
         }
 
         public void SongDelete(String artis, String name, String user)
@@ -453,7 +467,7 @@ namespace AchordLira.Models.Neo4J
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
 
-            redisClient.AddSongToRedis(artis + " - " + name);
+            dbRedis.AddSongToRedis(artis + " - " + name);
         }
 
         public void SongUpdate()

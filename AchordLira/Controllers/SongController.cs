@@ -15,6 +15,7 @@ namespace AchordLira.Controllers
         //GET /Song/Index/
         public ActionResult Index(string artist, string song,string genre)
         {
+
             ViewBag.showNav = true;
             SongPageViewModel pageModel = new SongPageViewModel();
             //Is loged 
@@ -24,6 +25,9 @@ namespace AchordLira.Controllers
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
             RedisDataProvider dbRedis = new RedisDataProvider();
 
+            dbRedis.IncrementSongVisitCount(artist + " - " + song);
+
+
             #region NavBarData
 
             if (genre == "All" || genre == "")
@@ -32,7 +36,7 @@ namespace AchordLira.Controllers
                 pageModel.genre = genre;
 
             //Getting artists
-            pageModel.artists = dbNeo4j.ArtistRead(genre);
+            pageModel.artists = dbNeo4j.ArtistRead(pageModel.genre);
             for (char c = 'A'; c <= 'Z'; c++)
             {
                 if (pageModel.artists.ContainsKey(c.ToString()))
@@ -64,8 +68,6 @@ namespace AchordLira.Controllers
                 pageModel.favorite = dbNeo4j.SongCheckIsFavorite(song, artist, pageModel.user.name);
 
             pageModel.artist = artist;
-
-            dbRedis.IncrementSongVisitCount(artist + " - " + song);
 
             return View(pageModel);
         }

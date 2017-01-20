@@ -4,47 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace AchordLira.Models.Redis
 {
     public class RedisDataProvider
     {
-        private static string backUpFileName = "db_backup.txt";
-        private static string tmpBackUpFilename = "tmpbackup.txt";
-        private static bool useFileBackUp = true;
-
-        /** Metoda za testiranje, obrisi kad zavrsis */
-        public void Test()
-        {
-        }
-
-        /** Brisanje sadrzaja baze, reset counter na 1, ucitavanje iz backup fajla */
-        //pitn
-
-            //TODO: OBRISI I PREPRAVI FUNKCIJE KAD SE ZAVRSI DATA DUMP
-        public void ResetDatabase()
+        public void DeleteAll()
         {
             var redisClient = RedisDataLayer.GetClient();
             redisClient.FlushAll();
-            redisClient.SetValue("counter", "1");
-
-            //ako je slucajno ostao stari tmp, obrisi ga
-            if (File.Exists(tmpBackUpFilename))
-                File.Delete(tmpBackUpFilename);
-
-            //Upis iz fajla u bazu
-            string line = null;
-            using (StreamReader reader = new StreamReader(backUpFileName))
-            {
-                while ((line = reader.ReadLine()) != null)
-                {
-                    InsertSearchPhrase(line, true);
-                }
-            }
-
-            //brisanje starog i rename tmp-a u default ime
-            File.Delete(backUpFileName);
-            File.Move(tmpBackUpFilename, backUpFileName);
         }
 
         #region AutoComplete
@@ -62,7 +31,7 @@ namespace AchordLira.Models.Redis
         }
 
         /** Metoda za dodavanje pesme u bazu, i u backup file */
-        public void InsertSearchPhrase(string phrase, bool fromBackup)
+        public void InsertSearchPhrase(string phrase)
         {
             var redisClient = RedisDataLayer.GetClient();
 
@@ -94,17 +63,6 @@ namespace AchordLira.Models.Redis
             foreach (var partialString in partialStrings)
             {
                 redisClient.AddItemToSortedSet("search." + partialString, counter, 1);
-            }
-
-            //Snimanje u file
-            if(useFileBackUp)
-            {
-                string fileName = fromBackup ? tmpBackUpFilename : backUpFileName;
-
-                using (StreamWriter writer = new StreamWriter(fileName, true))
-                {
-                    writer.WriteLine(phrase);
-                }
             }
            
             //counter++
@@ -143,31 +101,6 @@ namespace AchordLira.Models.Redis
                     //obrisi mu element vezan za frazu koja se brise
                     redisClient.RemoveItemFromSortedSet(set, keyToDelete);
             }
-
-            //Brisanje iz fajla, prepisuje se ceo fajl u tmp
-            //uz izostavljanje linije sa datom frazom
-            if (useFileBackUp)
-            {
-                string line = null;
-                using (StreamReader reader = new StreamReader(backUpFileName))
-                {
-                    using (StreamWriter writer = new StreamWriter(tmpBackUpFilename))
-                    {
-                        while ((line = reader.ReadLine()) != null)
-                        {
-                            if (String.Compare(line, phrase) == 0)
-                                continue;
-
-                            writer.WriteLine(line);
-                        }
-                    }
-                }
-
-                //brisanje starog i move u novi, hack za rename
-                File.Delete(backUpFileName);
-                File.Move(tmpBackUpFilename, backUpFileName);
-            }
-            
         }
 
         /** Osnovna metoda, za uneti string vraca sva poklapanja za autocomplete */
@@ -175,7 +108,7 @@ namespace AchordLira.Models.Redis
         {
             var redisClient = RedisDataLayer.GetClient();
 
-            string[] words = text.ToLower().Split(' ');
+            string[] words = Regex.Replace(text.ToLower(), " *- *", " ").Split(new char[] { ' ' },  StringSplitOptions.RemoveEmptyEntries);
 
             string[] hashKeys = null;
             List<string> phrases;
@@ -214,6 +147,12 @@ namespace AchordLira.Models.Redis
             return phrases;
         }
 
+        public void ResetHashCounter()
+        {
+            var redisClient = RedisDataLayer.GetClient();
+            redisClient.SetValue("counter", "1");
+        }
+
         /** Pomocna funkcija za dekompoziciju reci u podstringove potrebne za indeksiranje */
         public List<string> DecomposeWord(string word)
         {
@@ -241,7 +180,15 @@ namespace AchordLira.Models.Redis
         public List<string> GetMostPopularSongs(int number)
         {
             var redisClient = RedisDataLayer.GetClient();
-            return redisClient.GetRangeFromSortedSetByHighestScore("songs.popular", 0, number);
+            IDictionary<string, double> tmp = redisClient.GetRangeWithScoresFromSortedSetDesc("songs.popular", 0, number - 1);
+            List<string> popular = new List<string>();
+
+            foreach (var item in tmp)
+            {
+                popular.Add(item.Key);
+            }
+
+            return popular;
         }
 
         public List<string> GetLatestSongs()
@@ -255,9 +202,9 @@ namespace AchordLira.Models.Redis
             var redisClient = RedisDataLayer.GetClient();
             redisClient.AddItemToSortedSet("songs.popular", name, 0);
             redisClient.IncrementValue("songs.count");
-            redisClient.TrimList("songs.latest", 0, 4);
             redisClient.PushItemToList("songs.latest", name);
-            InsertSearchPhrase(name, false);
+            redisClient.TrimList("songs.latest", 0, 4);
+            InsertSearchPhrase(name);
         }
 
         public string GetSongCount()
@@ -337,6 +284,12 @@ namespace AchordLira.Models.Redis
         {
             var redisClient = RedisDataLayer.GetClient();
             redisClient.IncrementValue("admin.notification.count");
+        }
+
+        public void RemoveAdminNotification()
+        {
+            var redisClient = RedisDataLayer.GetClient();
+            redisClient.DecrementValue("admin.notification.count");
         }
 
         public string GetAdminNotificationsCount()

@@ -41,7 +41,7 @@ namespace AchordLira.Controllers
                 pageModel.genre = genre;
 
             //Getting artists
-            pageModel.artists = dbNeo4j.ArtistRead(genre);
+            pageModel.artists = dbNeo4j.ArtistRead(pageModel.genre);
             for (char c = 'A'; c <= 'Z'; c++)
             {
                 if (pageModel.artists.ContainsKey(c.ToString()))

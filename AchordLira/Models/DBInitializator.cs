@@ -30,9 +30,16 @@ namespace AchordLira.Models
 
         public void Initialize()
         {
-            string date = DateTime.Now.ToString("dd-MM-yyyy");
 
+            DeleteAllData();
+
+            string date = DateTime.Now.ToString("dd-MM-yyyy");
+            
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+            RedisDataProvider dbRedis = new RedisDataProvider();
+
+            dbRedis.ResetHashCounter();
+
             StreamReader stream;
             //Check is database initialized
             if (dbNeo4j.UserExists("admin", "admin"))
@@ -223,7 +230,7 @@ namespace AchordLira.Models
 
             #endregion
 
-            #region Create songs
+            #region Create songdrafts
 
             string[] songDraftPaths = Directory.GetFiles(HostingEnvironment.MapPath(songDraftFolderPath));
             foreach (string songDraftPath in songDraftPaths)
@@ -239,6 +246,7 @@ namespace AchordLira.Models
                     songDraft.date = date;
                     dbNeo4j.SongDraftCreate(songDraft, user);
                     stream.Close();
+                    dbRedis.AddAdminNotification();
                 }
                 catch (Exception e)
                 {
@@ -253,7 +261,9 @@ namespace AchordLira.Models
         public void DeleteAllData()
         {
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
+            RedisDataProvider dbRedis = new RedisDataProvider();
             dbNeo4j.DeleteBase();
+            dbRedis.DeleteAll();        
         }
     }
 }

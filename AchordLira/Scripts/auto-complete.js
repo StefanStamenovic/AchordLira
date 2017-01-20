@@ -232,7 +232,7 @@ window.onload = function () {
         source: function (term, suggest) {
             $.ajax({
                 type: "POST",
-                url: '/Home/Search',
+                url: '@Url.Action("Search", "Home")',
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 async: true,
