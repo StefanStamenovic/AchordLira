@@ -1,4 +1,8 @@
-﻿
+﻿/* *************************************************
+//       SingerJS | Simple chord highlighter.     //
+//       Copyright © 2015 Sergei Kriger           //
+// ************************************************/
+
 function Singer(song) {
     "use strict";
 

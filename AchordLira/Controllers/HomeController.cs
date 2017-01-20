@@ -18,7 +18,7 @@ namespace AchordLira.Controllers
         {
             #region Inicijalizacija baza podataka
 
-            DBInitializator initializator = new DBInitializator();
+            DBInitializer initializator = new DBInitializer();
             initializator.Initialize();
 
             #endregion

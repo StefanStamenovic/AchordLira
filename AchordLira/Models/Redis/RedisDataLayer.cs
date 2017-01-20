@@ -11,8 +11,6 @@ namespace AchordLira.Models.Redis
     {
         private static IRedisClientsManager manager = null;
         private static object objLock = new object();
-        private static string redisConnectionString = "";
-
 
         public static IRedisClient GetClient()
         {

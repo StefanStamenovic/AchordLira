@@ -10,15 +10,10 @@ namespace AchordLira.Models.Redis
 {
     public class RedisDataProvider
     {
-        public void DeleteAll()
-        {
-            var redisClient = RedisDataLayer.GetClient();
-            redisClient.FlushAll();
-        }
 
         #region AutoComplete
 
-        /** Dodaje tekst u kes pretrage za korisnika */
+        /** Dodaje tekst u kes pretrage za odredjenog (registrovanoh) korisnika */
         public void AddSearchPhraseFromUser(string userID, string phrase)
         {
             var redisClient = RedisDataLayer.GetClient();
@@ -30,7 +25,7 @@ namespace AchordLira.Models.Redis
             
         }
 
-        /** Metoda za dodavanje pesme u bazu, i u backup file */
+        /** Metoda za dodavanje pesme u bazu*/
         public void InsertSearchPhrase(string phrase)
         {
             var redisClient = RedisDataLayer.GetClient();
@@ -69,7 +64,7 @@ namespace AchordLira.Models.Redis
             redisClient.IncrementValue("counter");
         }
 
-        /**Brisanje pesme iz baze za pretragu i backup fajla */
+        /**Brisanje pesme iz baze za pretragu */
         public void DeleteSearchPhrase(string phrase)
         {
             var redisClient = RedisDataLayer.GetClient();
@@ -119,6 +114,7 @@ namespace AchordLira.Models.Redis
             //Ako je u pitanju jedna rec, prosto vrati poklapanja
             else if (words.Length == 1)
             {
+                //Buduci da autocomplete radi samo od dva ukucana slova, ako korisnik ukuca jedno slovo dobice do 10 poslednjih pretrazenih fraza
                 if (words[0].Length == 1 && userID != null && autocomplete)
                     return redisClient.GetAllItemsFromList("user.search." + userID);
                 else
@@ -147,6 +143,7 @@ namespace AchordLira.Models.Redis
             return phrases;
         }
 
+        //Resetuje counter za inicijalizaciju
         public void ResetHashCounter()
         {
             var redisClient = RedisDataLayer.GetClient();
@@ -170,13 +167,22 @@ namespace AchordLira.Models.Redis
 
 
         #region Data & Statictics
+        
+        //Reset baze
+        public void DeleteAll()
+        {
+            var redisClient = RedisDataLayer.GetClient();
+            redisClient.FlushAll();
+        }
 
+        //++ kada se poseti stranica pesme
         public void IncrementSongVisitCount(string id)
         {
             var redisClient = RedisDataLayer.GetClient();
             redisClient.IncrementItemInSortedSet("songs.popular", id, 1);
         }
 
+        //<number> najpopularnijih pesama iz sortiranog skupa
         public List<string> GetMostPopularSongs(int number)
         {
             var redisClient = RedisDataLayer.GetClient();
@@ -191,11 +197,17 @@ namespace AchordLira.Models.Redis
             return popular;
         }
 
+        //5 poslednjih pesama(lista radi kao red velicine 5)
         public List<string> GetLatestSongs()
         {
             var redisClient = RedisDataLayer.GetClient();
             return redisClient.GetAllItemsFromList("songs.latest");
         }
+
+
+        /*
+         * Dodavanje potrebnih informacija za pesme, izvodjace i zanrove
+         */ 
 
         public void AddSongToRedis(string name)
         {
@@ -274,6 +286,7 @@ namespace AchordLira.Models.Redis
             redisClient.DecrementValue("genres.count");
         }
 
+        //Reset obavestenja za admina o novim pesmama kada klikne na tu karticu
         public void ClearAdminNotifications()
         {
             var redisClient = RedisDataLayer.GetClient();
@@ -286,6 +299,7 @@ namespace AchordLira.Models.Redis
             redisClient.IncrementValue("admin.notification.count");
         }
 
+        //Brisanje ako se obrisu draftovi dok jos nije clearovano
         public void RemoveAdminNotification()
         {
             var redisClient = RedisDataLayer.GetClient();
@@ -303,5 +317,6 @@ namespace AchordLira.Models.Redis
 
 
         #endregion
+
     }
 }

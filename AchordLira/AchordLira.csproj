@@ -206,7 +206,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\DBInitializator.cs" />
+    <Compile Include="Models\DBInitializer.cs" />
     <Compile Include="Models\Neo4J\Models\Artist.cs" />
     <Compile Include="Models\Neo4J\Models\Comment.cs" />
     <Compile Include="Models\Neo4J\Models\Genre.cs" />

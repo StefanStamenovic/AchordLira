@@ -14,8 +14,8 @@ namespace AchordLira.Models.Neo4J
     {
         private GraphClient client;
         private Uri db_adres = new Uri("http://localhost:7474/db/data");
-        private string user_name = "neo4j";
-        private string password = "Stefan@1994";
+        private static string user_name = "neo4j";
+        private static string password = "Stefan@1994";
         public string erorr = null;
         private RedisDataProvider dbRedis = new RedisDataProvider();
 
@@ -77,11 +77,6 @@ namespace AchordLira.Models.Neo4J
             ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
-        public void UserUpdate()
-        {
-
-        }
-
         public User UserRead(string email,string password)
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
@@ -130,7 +125,6 @@ namespace AchordLira.Models.Neo4J
             return user;
         }
 
-        //Search to see if user exists whit given email or password
         public bool UserExists(string email, string name)
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
@@ -168,7 +162,6 @@ namespace AchordLira.Models.Neo4J
             return songs;
         }
 
-
         #endregion
 
         #region Genre
@@ -198,11 +191,7 @@ namespace AchordLira.Models.Neo4J
 
             dbRedis.RemoveGenreFromRedis();
         }
-        
-        public void GenreUpdate()
-        {
-
-        }
+       
 
         public List<string> GenreRead()
         {
@@ -255,11 +244,6 @@ namespace AchordLira.Models.Neo4J
             ((IRawGraphClient)client).ExecuteCypher(query);
 
             dbRedis.RemoveArtistFromRedis();
-        }
-
-        public void ArtistUpdate()
-        {
-
         }
 
         //Vraca sve artiste po zanru
@@ -319,6 +303,7 @@ namespace AchordLira.Models.Neo4J
             ViewArtist artist = new ViewArtist(qres);
             return artist;
         }
+
         #endregion
 
         #region SongDraft
@@ -468,11 +453,6 @@ namespace AchordLira.Models.Neo4J
             ((IRawGraphClient)client).ExecuteCypher(query);
 
             dbRedis.AddSongToRedis(artis + " - " + name);
-        }
-
-        public void SongUpdate()
-        {
-
         }
 
         public List<ViewSong> SongRead(String user)
@@ -643,11 +623,6 @@ namespace AchordLira.Models.Neo4J
             ((IRawGraphClient)client).ExecuteCypher(query);
         }
 
-        public void CommentUpdate()
-        {
-
-        }
-
         public List<ViewComment> CommentRead(String artist, String song)
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();
@@ -725,11 +700,6 @@ namespace AchordLira.Models.Neo4J
                        dictionary, CypherResultMode.Set);
 
             ((IRawGraphClient)client).ExecuteCypher(query);
-        }
-
-        public void SongRequestUpdate()
-        {
-
         }
 
         public List<ViewSongRequest> SongRequestRead()

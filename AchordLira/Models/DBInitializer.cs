@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace AchordLira.Models
 {
-    public class DBInitializator
+    public class DBInitializer
     {
         string userFilePath = @"~/Initialization_Data/users.txt";
         string genresFilePath = @"~/Initialization_Data/genres.txt";
@@ -23,8 +23,7 @@ namespace AchordLira.Models
         string songRequestFilePath = @"~/Initialization_Data/requests.txt";
         string songDraftFolderPath = @"~/Initialization_Data/SongDrafts/";
 
-        //Uncomment in HomeController to initialize
-        public DBInitializator()
+        public DBInitializer()
         {
         }
 

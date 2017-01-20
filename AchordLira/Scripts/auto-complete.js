@@ -1,4 +1,12 @@
-﻿var autoComplete = (function () {
+﻿/*
+    JavaScript autoComplete v1.0.4
+    Copyright (c) 2014 Simon Steinberger / Pixabay
+    GitHub: https://github.com/Pixabay/JavaScript-autoComplete
+    License: http://www.opensource.org/licenses/mit-license.php
+*/
+
+
+var autoComplete = (function () {
     // "use strict";
     function autoComplete(options) {
         if (!document.querySelector) return;
@@ -214,7 +222,7 @@
         window.autoComplete = autoComplete;
 })();
 
-
+//Kreira autocomplete i bind jquery na user stranicu
 window.onload = function () {
     var auto = new autoComplete({
         selector: '#search',
@@ -238,6 +246,8 @@ window.onload = function () {
             });
         }
     });
+
+    //def. in user-utility.js
     user_utility();
 };
 
