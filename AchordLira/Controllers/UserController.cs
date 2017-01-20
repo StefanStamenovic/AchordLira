@@ -80,11 +80,12 @@ namespace AchordLira.Controllers
             return View(pageModel);
         }
 
-        // GET /User/Profile
+        // GET /User/Info
         public ActionResult Info(string user,string genre)
         {
             UserInfoPageViewModel pageModel = new UserInfoPageViewModel();
-
+            if (Session["user"] != null && Session["user"].GetType() == (typeof(ViewUser)))
+                pageModel.user = (ViewUser)(Session["user"]);
             Neo4jDataProvider dbNeo4j = new Neo4jDataProvider();
 
             #region NavBarData
@@ -113,7 +114,7 @@ namespace AchordLira.Controllers
             #endregion
 
             //Geting user created songs
-            pageModel.userSongs = dbNeo4j.GetUserSongsAndDrafts(user);
+            pageModel.userSongs = dbNeo4j.SongRead(user);
 
             //Geting user
             pageModel.profile = dbNeo4j.UserRead(user);

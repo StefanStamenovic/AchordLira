@@ -63,11 +63,6 @@ namespace AchordLira.Models.Neo4J
                        dictionary, CypherResultMode.Set);
             int count = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList().Count;
 
-            for (int i = 0; i < count; i++)
-            {
-                dbRedis.RemoveAdminNotification();
-            }
-
             query = new CypherQuery("MATCH (user:User)-[relation:REQUESTED]->(draft:SongDraft) WHERE user.name = {name} DETACH DELETE draft",
                        dictionary, CypherResultMode.Set);
             ((IRawGraphClient)client).ExecuteCypher(query);
