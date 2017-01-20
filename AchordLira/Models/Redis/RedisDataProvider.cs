@@ -31,7 +31,11 @@ namespace AchordLira.Models.Redis
             var redisClient = RedisDataLayer.GetClient();
 
             //prebacuje u lowercase i razdvaja u reci
-            string[] words = phrase.ToLower().Split(' ');
+            string[] words = Regex.
+                Replace(phrase.ToLower(), " *- *", " ")
+                .Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(s => s.Length > 1)
+                .ToArray();
             List<string> partialStrings = new List<string>();
 
             //razdvaja svaku rec u parcijalne reci pocevsi
@@ -103,7 +107,11 @@ namespace AchordLira.Models.Redis
         {
             var redisClient = RedisDataLayer.GetClient();
 
-            string[] words = Regex.Replace(text.ToLower(), " *- *", " ").Split(new char[] { ' ' },  StringSplitOptions.RemoveEmptyEntries);
+            string[] words = Regex.
+                Replace(text.ToLower(), " *- *", " ")
+                .Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(s => s.Length > 1)
+                .ToArray();
 
             string[] hashKeys = null;
             List<string> phrases;
