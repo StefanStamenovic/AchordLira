@@ -130,20 +130,6 @@ namespace AchordLira.Models.Neo4J
             return true;
         }
 
-
-        public void UserAddFavoriteSong(string user,string artist,string song)
-        {
-            Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            dictionary.Add("user_name", user);
-            dictionary.Add("artist_name", artist);
-            dictionary.Add("song_name", song);
-            CypherQuery query = new CypherQuery("MATCH (user:User{name: {user_name}}),(song:Song{name: {song_name}})-[relation:PERFORMED_BY]->(artist:Artist{name: {artist_name}}) CREATE (user)-[relation:FAVORITE]->(song)",
-                           dictionary, CypherResultMode.Set);
-            List<User> result = ((IRawGraphClient)client).ExecuteGetCypherResults<User>(query).ToList();
-            ((IRawGraphClient)client).ExecuteCypher(query);
-        }
-
-
         public List<ViewSong> UserGetFavoriteSongs(string user)
         {
             Dictionary<string, object> dictionary = new Dictionary<string, object>();

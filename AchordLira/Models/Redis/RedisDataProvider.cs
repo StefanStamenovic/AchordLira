@@ -20,6 +20,8 @@ namespace AchordLira.Models.Redis
 
         /** Brisanje sadrzaja baze, reset counter na 1, ucitavanje iz backup fajla */
         //pitn
+
+            //TODO: OBRISI I PREPRAVI FUNKCIJE KAD SE ZAVRSI DATA DUMP
         public void ResetDatabase()
         {
             var redisClient = RedisDataLayer.GetClient();
